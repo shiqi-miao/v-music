@@ -1,0 +1,709 @@
+<style scoped>
+    .box{width: 80%;height:150px;border-radius: 5px;border: 1px solid #e6e6e6;margin-bottom:20px;padding:0 3%;position: relative}
+    .top{padding: 20px}
+    .flex-center{
+        width: 100%;
+        display: flex;
+        display: -webkit-flex;
+        align-items: center;
+        -webkit-align-items: center;
+        justify-content: center;
+        -webkit-justify-content: center;
+    }
+    .flex-1 {
+        flex: 1;
+    }
+    .flex-2 {
+        flex: 2;
+    }
+    .flex-10 {
+        flex: 10;
+    }
+    .blue{
+     color:#66b1ff;
+     cursor: pointer;
+     padding: 10px 6px;
+    }
+    .p-absolute{
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        padding-right: 5%
+    }
+    .center{text-align: center}
+    .left{padding-left: 5%}
+    .right{padding-top: 3%}
+    .left .title{font-size: 30px;font-weight: 400}
+    .left p{font-size: 20px;font-weight: 400}
+    .el-date-editor{margin-top: 20px;margin-bottom:40px}
+    .row-box{width: 60%;border: 1px solid #e4e4e4;border-bottom:0;padding-bottom: 1%}
+    .row-box .col-box{height:120px;position: relative;border: 1px solid #e4e4e4;padding: 1%;text-align: center}
+    .row-box .col-box .num{width:50%;height:17%;position: absolute;left: 0;border: 1px solid #e4e4e4;border-left:0;border-bottom-right-radius: 10px;border-top-right-radius: 10px;}
+    .row-bottom{width: 60%;border: 1px solid #e4e4e4;border-top:0;height: 100px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;}
+    .take{width: 50%;height: 85%}
+    .skuimg{margin-top: 15px}
+    .skuname{font-size: 14px;margin:0}
+</style>
+
+<template>
+    <div>
+        <div class="" style="display:flex;display: -webkit-flex;">
+            <div class="flex-2 left">
+                <br>
+                <br>
+                <br>
+                <br>
+                <span>计划应用门店</span>
+                <br>
+                <br>
+                <el-select v-model="storeValue" placeholder="请选择"  @change="changeStore">
+                    <el-option
+                    v-for="item in storeOptions"
+                    :key="item.storeCode"
+                    :label="item.storeName"
+                    :value="item.storeCode">
+                    </el-option>
+                </el-select>
+                <br>
+                <br>
+                <span>计划应用机器</span>
+                <br>
+                <br>
+                <el-select v-model="machineValue" placeholder="请选择">
+                    <el-option
+                    v-for="item in machineOptions"
+                    :key="item.machineCode"
+                    :label="item.machineName"
+                    :value="item.machineCode">
+                    </el-option>
+                </el-select>
+                <br>
+                <br>
+                <span>计划应用时间</span>
+                <!-- <el-date-picker
+                    v-model="time"
+                    type="datetime"
+                    value-format="yyyy-MM-dd H"
+                    format="yyyy-MM-dd H"
+                    placeholder="选择日期时间">
+                </el-date-picker> -->
+                <el-date-picker
+                    v-model="dateTime"
+                    type="date"
+                    placeholder="选择日期"
+                    :picker-options="pickerOptions0"
+                    @change="changeDateTime">
+                </el-date-picker>
+                <el-time-select
+                    v-model="timeTime"
+                    :picker-options="{
+                        start:nowTime,
+                        step: '00:30',
+                        end: '23:30'
+                    }"
+                    placeholder="选择时间">
+                </el-time-select>
+                <br>
+                <br>
+                <el-button @click="back" type="info">返    回</el-button>
+                <br>
+                <br>
+                <el-button @click="savenow" type="primary">保存</el-button>
+                <br>
+                <br>
+                <!-- <el-button @click="save" type="primary" :disabled="!SalePlanDetails.flag">执行</el-button> -->
+                <!-- <el-button @click="save" type="primary">执行计划</el-button> -->
+            </div>
+            <div class="flex-10 right">
+                <div v-for="(item,key) in data" :key="key" class="row-box flex-center">
+                    <div v-for="i in item" :key="i.trailsNo" class="col-box flex-1">
+                        <div class="num">
+                            {{i.trailsNo}}
+                        </div>
+                        <div v-if="i.hasSku=='1'">
+                            <img :src="i.appPicture" alt="" 
+                            width="40"
+                            height="40"
+                            class="skuimg">
+                            <p class="skuname">{{i.skuName}}</p>
+                            <p style="cursor:pointer;color:#29d;font-size:12px;" @click="addSku(i)">点击更换</p>
+                        </div>
+                        <span style="line-height:120px;cursor:pointer;color:#606266" @click="addSku(i)" v-if="i.hasSku!=='1'">点击上架</span>
+                        <!-- <span style="line-height:120px;cursor:pointer;color:#606266" @click="addSku(i)"  v-if="i.hasSku=='1'">更换SKU</span> -->
+                    </div>
+                </div>
+                <div class="row-bottom center">
+                    <el-button class="take">取货口</el-button>
+                </div>
+            </div>
+        </div>
+        <el-dialog title="上架SKU"
+                   :visible.sync="addSkuVisible"
+                   width="66%"
+                   :close-on-click-modal="false">
+            <div v-if="editType == 1">
+                <div class="content flex-center-Y"  v-if="skuData.skuName">
+                    <span>当前SKU名称： {{skuData.skuName}}&emsp;</span>
+                    <img :src="skuData.appPicture"
+                         width="40"
+                         height="40"
+                         class="portrait" />
+                </div>
+                <el-input placeholder="请输入内容"
+                          v-model="searchValue"
+                          class="input-with-select">
+                    <el-button slot="prepend">SKU名称</el-button>
+                    <el-button slot="append"
+                               icon="el-icon-search"
+                               @click="search"></el-button>
+                </el-input>
+            </div>
+            <div v-else-if="editType == 2">
+                <div class="content flex-center-Y">
+                    <span>当前SKU名称： {{skuData.skuName}}&emsp;</span>
+                    <img :src="skuData.appPicture"
+                         width="40"
+                         height="40"
+                         class="portrait" />
+                </div>
+                <div class="content">当前促销方案：</div>
+                <div class="content">
+                    选择促销方案
+                </div>
+            </div>
+            <div v-else-if="editType == 3">
+                <el-input placeholder="请输入内容"
+                          v-model="searchValue"
+                          class="input-with-select">
+                    <el-button slot="prepend">SKU名称</el-button>
+                    <el-button slot="append"
+                               icon="el-icon-search"
+                               @click="search"></el-button>
+                </el-input>
+            </div>
+            <el-table ref="multipleTable"
+                      stripe
+                      :data="skuTableData"
+                      tooltip-effect="dark"
+                      style="width: 100%;"
+                      height="440"
+                      @current-change="handleSelectionChange"
+                      v-loading.body="listLoading"
+                      element-loading-text="拼命加载中">
+                <el-table-column type="selection"
+                                 width="55">
+                    <template slot-scope="scope">
+                        <el-checkbox v-model="scope.row.checked"></el-checkbox>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="skuName"
+                                 label="SKU名称">
+                                 <template slot-scope="scope">
+                                 <span>{{scope.row.skuName}}<span v-if="scope.row.skuNow=='Y'">(生鲜类)</span></span>
+                                 </template>
+                                 </el-table-column>
+                <el-table-column prop="appPicture"
+                                 label="图片"
+                                 style="width: 18%"
+                                 align="center">
+                    <template slot-scope="scope">
+                        <img :src="scope.row.appPicture"
+                             width="40"
+                             height="40"
+                             class="portrait" />
+                    </template>
+                </el-table-column>
+                <el-table-column prop="profits"
+                                 label="利润率"
+                                 style="width: 18%"
+                                 align="center">
+                </el-table-column>
+                <el-table-column prop="wareSkuNum"
+                                 label="库存数量"
+                                 style="width: 18%"
+                                 align="center">
+                </el-table-column>
+                <el-table-column prop="wareLimit"
+                                 label="库存预警值"
+                                 style="width: 18%"
+                                 align="center">
+                                 <template slot-scope="scope">
+                                     <el-input-number v-model="scope.row.wareLimit" @change="add(scope.row)" :min="0" size="mini" label="描述文字"></el-input-number>
+                                </template>
+                </el-table-column>
+                <el-table-column prop="skuNum"
+                                 label="本计划消耗量"
+                                 style="width: 18%"
+                                 align="center">
+                </el-table-column>
+                <el-table-column prop="orderNum"
+                                 label="近10天消耗量"
+                                 style="width: 18%"
+                                 align="center">
+                </el-table-column>
+                <el-table-column prop="purchasePeriod"
+                                 label="采购周期"
+                                 style="width: 18%"
+                                 align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.purchasePeriod}}天
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination-line">
+                <el-pagination background
+                               @size-change="handleSizeChange"
+                               @current-change="currentChange"
+                               :current-page="skuParams.pageNum"
+                               :page-size="skuParams.pageRow"
+                               :total="totalCount"
+                               :page-sizes="[10, 20, 50, 100]"
+                               layout="total, sizes, prev, pager, next, jumper">
+                </el-pagination>
+            </div>
+            <span slot="footer"
+                  class="dialog-footer">
+                <el-button @click="addSkuVisible = false">取 消</el-button>
+                <el-button type="primary"
+                           @click="confirm">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog title="以下sku无法按预期时间到货,是否确定执行计划?" :visible.sync="unusualVisible" :close-on-click-modal="false">
+            <el-table :data="unusualData">
+                <el-table-column prop=""
+                                 label="SKU名称">
+                                 <template slot-scope="scope">
+                                 <span>{{scope.row.skuName}}<span v-if="scope.row.skuNow=='Y'">(生鲜类)</span></span>
+                                 </template>
+                                 </el-table-column>
+                <el-table-column prop="appPicture"
+                                 label="图片"
+                                 style="width: 18%"
+                                 align="center">
+                    <template slot-scope="scope">
+                        <img :src="scope.row.appPicture"
+                             width="40"
+                             height="40"
+                             class="portrait" />
+                    </template>
+                </el-table-column>
+                <el-table-column prop="channelid"
+                                 label="货道编号"
+                                 style="width: 18%"
+                                 align="center">
+                </el-table-column>
+                <el-table-column prop="purchasePeriod"
+                                 label="采购周期"
+                                 style="width: 18%"
+                                 align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.purchasePeriod}}天
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="unusualVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveTrue">确 定</el-button>
+            </div>
+        </el-dialog>
+    </div>
+</template>
+<script>
+import { mapGetters } from 'vuex'
+export default {
+    data() {
+        return {
+            now:new Date(),
+            nowTime:"",
+            standTime:"",
+            dateTime:"",
+            timeTime:"",
+           time:"",
+           pickerOptions0: { 
+                disabledDate(time) {
+                    return time.getTime() < Date.now() - 8.64e7;//如果没有后面的-8.64e7就是不可以选择今天的 
+                }
+            },
+           listLoading: false,
+           addSkuVisible:false,
+           skuParams: {
+                pageRow: 10,
+                pageNum: 1,
+                storeCode:this.storeValue
+            },
+            totalCount: 0,
+            skuTableData: [],
+            editType: 1,
+            skuData: {},
+            skuInfo:{},
+            skuCode: "",
+            channelid:"",
+            searchValue: "",
+            unusualData:[],
+            unusualVisible:false,
+            SalePlanDetails:{},
+            machineOptions:[],
+            machineValue:"",
+            storeOptions:[],
+            storeValue:"",
+            id:"",
+           data:[
+            //    {list:[
+            //                             {id:"A01",info:"1"},
+            //                             {id:"A02",info:"2"},
+            //                             {id:"A03",info:"3"},
+            //                             {id:"A04",info:"4"},
+            //                             {id:"A05",info:"5"},
+            //                             {id:"A06",info:"6"},
+            //                             {id:"A07",info:"7"},
+            //                             {id:"A08",info:"8"},
+            //                             ]
+            //     },
+                
+           ]
+        }
+    },
+    created(){
+        this.dateTime=this.now
+        let time = this.now.getTime() + 1000*60*30;
+        let standTime=new Date(time)
+        this.standTime=standTime.getHours()+1+':00'
+        // this.standTime=this.now.getHours()+1+':00'
+        this.timeTime=this.standTime
+        if(this.dateTime.getMonth()==this.now.getMonth() && this.dateTime.getDate()==this.now.getDate()){
+                this.nowTime=this.standTime
+            }else{
+                this.nowTime="00:00"
+            }
+        console.log(this.dateTime)
+        this.api({//全部门店
+                url: "/inventory/showAllStore ",
+                method: "post",
+                data: {
+                    // username:"13616521896"
+                    username: this.userName
+                }
+            }).then(data => {
+                this.storeOptions=data
+                this.storeValue=data[0].storeCode
+                this.getInfo()
+                this.getVend()
+            });
+        
+        
+    },
+    computed: {
+        ...mapGetters([
+            'userName'
+        ])
+    },
+    methods: {
+        getVend(){
+            this.api({//全部机器
+                url: "/inventory/showVendByCopy ",
+                method: "post",
+                data: {
+                    salePlanId:this.$route.params.id,
+                    storeCode:this.storeValue,
+                    machineCode:this.$route.params.machineCode   
+                }
+            }).then(data => {
+                this.machineOptions=data
+            });
+        },
+        changeDateTime(){
+            if(this.dateTime.getMonth()==this.now.getMonth() && this.dateTime.getDate()==this.now.getDate()){
+                this.nowTime=this.standTime
+            }else{
+                this.nowTime="00:00"
+            }
+        },
+        changeStore(){
+            this.getVend()
+        },
+        getInfo(){
+            this.api({
+                url: "/inventory/showTheTimeDetails",
+                method: "post",
+                data: {
+                    machineCode:this.$route.params.machineCode,
+                    storeCode:this.$route.params.storeCode,
+                    username:this.userName
+                    }
+            })
+                .then(data => {
+                   this.SalePlanDetails=data
+                   this.data=data.trailsList
+                   this.skuInfo=data.jsonList
+                   for(let i in this.data){
+                       for(let g in this.data[i]){
+                           for(let key in this.skuInfo){
+                           if(this.data[i][g].trailsNum==this.skuInfo[key].channelid && this.skuInfo[key].skuNum!==0){
+                               this.data[i][g].hasSku="1"
+                               this.data[i][g].skuName=this.skuInfo[key].skuName
+                               this.data[i][g].skuCode=this.skuInfo[key].skuCode
+                               this.data[i][g].purchasePeriod=this.skuInfo[key].purchasePeriod
+                               this.data[i][g].appPicture=this.skuInfo[key].appPicture
+                               this.data[i][g].skuNum=this.skuInfo[key].skuNum
+
+                           }
+                       }
+                       }
+                       
+                   }
+                   console.log(this.data)
+                })
+        },
+        getSKUList(params) {
+            params.storeCode=this.$route.params.storeCode
+            this.api({
+                url: "/inventory/showSkuInfoList",
+                method: "post",
+                data: params
+            })
+                .then(data => {
+                    let lists = data.list;
+                    for (let i in lists) {
+                        if (lists[i].skuCode == this.skuData.skuCode) {
+                            lists[i].checked = true;
+                        } else {
+                            lists[i].checked = false;
+                        }
+                    }
+                    this.skuTableData = lists;
+                    this.$set(this, "skuTableData", lists);
+                    this.totalCount = data.totalCount;
+                    this.listLoading = false;
+                })
+                .catch(e => {});
+        },
+        handleSizeChange(val) {
+            this.skuParams.pageRow = val;
+            this.getSKUList(this.skuParams);
+        },
+        currentChange(index) {
+            this.skuParams.pageNum = index;
+            this.getSKUList(this.skuParams);
+        },
+        prevClick(index) {
+            this.skuParams.pageNum = index;
+            this.getSKUList(this.skuParams);
+        },
+        nextClick(index) {
+            this.skuParams.pageNum = index;
+            this.getSKUList(this.skuParams);
+        },
+        addSku(i){
+            this.channelid=i.trailsNum
+            this.getSKUList(this.skuParams)
+            this.addSkuVisible=true
+            for(let i in this.skuInfo){
+                if(this.channelid==this.skuInfo[i].channelid){
+                    this.skuData=this.skuInfo[i]
+                }
+            }
+            console.log(this.skuData)
+        },
+        handleSelectionChange(val) {
+            for (let i in this.skuTableData) {
+                this.$set(
+                    this.skuTableData[i],
+                    "checked",
+                    this.skuTableData[i].skuCode == val.skuCode
+                )
+                    ? true
+                    : false;
+            }
+            this.skuCode = val.skuCode;
+            this.purchasePeriod=val.purchasePeriod
+        },
+        search() {
+            this.skuParams.skuName = this.searchValue;
+            this.getSKUList(this.skuParams);
+        },
+        confirm() {
+                let month=this.dateTime.getMonth()+1
+                let date=this.dateTime.getDate()
+                let dateTime=this.dateTime.getFullYear()+'-'+month+'-'+date
+                this.dateTime=dateTime
+                this.SalePlanDetails.gmtPlan=this.dateTime+' '+this.timeTime
+                this.api({
+                url: "/inventory/addSkuToVend",
+                method: "post",
+                data: {
+                    skuCode: this.skuCode,
+                    salePlanId:this.$route.params.id,
+                    gmtPlan:this.SalePlanDetails.gmtPlan,
+                    channelid:this.channelid,
+                    purchasePeriod:this.purchasePeriod
+                }
+            })
+                .then(data => {
+                    this.$message({
+                        type: "success",
+                        message: "保存成功"
+                    });
+                    this.addSkuVisible = false;
+                    this.getInfo()
+                })
+
+
+            // let type = this.editType;
+            // if (type == 1) {
+            //     this.confirmA();
+            //     // this.modalTitle = '选择需更换SKU'
+            // } else if (type == 2) {
+            //     // this.modalTitle = '设置促销'
+            // } else if (type == 3) {
+            //     this.confirmA();
+            //     // this.modalTitle = '选择需上架的SKU'
+            // }
+        },
+        // confirmA() {
+        //     if (!this.skuCode) {
+        //         this.$message({
+        //             type: "warning",
+        //             message: "您未选择导出范围"
+        //         });
+        //         return;
+        //     }
+        //     this.api({
+        //         url: "/store/updateaislegoods",
+        //         method: "post",
+        //         data: {
+        //             aisleSku: this.skuCode,
+        //             channelId: this.skuData.aisleCode,
+        //             machineCode: this.machine,
+        //             batchCode: this.skuData.batchCode
+        //         }
+        //     })
+        //         .then(data => {
+        //             this.$message({
+        //                 type: "success",
+        //                 message: "保存成功"
+        //             });
+        //             this.getList();
+        //             this.editTypeDialogVisible = false;
+        //         })
+        //         .catch(e => {});
+        // },
+        savenow(){
+            this.api({
+                url: "/inventory/copyTheTimeSale",
+                method: "post",
+                data: {
+                    machineCode:this.$route.params.machineCode,
+                    storeCode:this.$route.params.storeCode,
+                    username:this.userName
+                    }
+            })
+                .then(data => {
+                   this.id=data
+                   this.$router.push({path:"/operation/planeNoEdit/"+this.id+'/'+this.$route.params.storeCode})
+
+                })
+        },
+        save(){
+            let month=this.dateTime.getMonth()+1
+            let date=this.dateTime.getDate()
+            let dateTime=this.dateTime.getFullYear()+'-'+month+'-'+date
+            this.dateTime=dateTime
+            this.time=this.dateTime+' '+this.timeTime
+            if(!this.time){
+                this.$message({
+                        type: "error",
+                        message: "请选择计划应用时间"
+                    });
+                    return;
+            }
+            if(!this.machineValue){
+                this.$message({
+                        type: "error",
+                        message: "请选择计划应用机器"
+                    });
+                    return;
+            }
+            this.api({
+                url: "/inventory/doTheSalePlan",
+                method: "post",
+                data: {
+                    salePlanId:this.$route.params.id,
+                    gmtPlan:this.time,
+                    machineCode:this.machineValue,
+                    flag:false
+                }
+            })
+                .then(data => {
+                   if(data.length==0){
+                       this.api({
+                        url: "/inventory/continueSalePlan",
+                        method: "post",
+                        data: {
+                            salePlanId:this.$route.params.id,
+                            gmtPlan:this.time,
+                            copyFlag:true,
+                            storeCode:this.storeValue,
+                            machineCode:this.machineValue,
+                            username: this.userName
+
+                        }
+                    })
+                        .then(data => {
+                        this.unusualVisible=false
+                        })
+                    this.$router.push({path:"/operation/plane"})
+                   }else{
+                       this.unusualVisible=true
+                       this.unusualData=data
+                   }
+                })
+
+            
+            
+        },
+        saveTrue(){
+            this.api({
+                url: "/inventory/continueSalePlan",
+                method: "post",
+                data: {
+                    salePlanId:this.$route.params.id,
+                    gmtPlan:this.time,
+                    copyFlag:true,
+                    storeCode:this.storeValue,
+                    machineCode:this.machineValue,
+                    username: this.userName
+
+                }
+            })
+                .then(data => {
+                   this.unusualVisible=false
+                   this.$router.push({path:"/operation/plane"})
+                })
+        },
+        
+            
+            
+        back(){
+            this.$router.push({path:"/operation/plane"})
+        },
+        add(row){
+            this.api({
+                url: "/inventory/updateWareLimit",
+                method: "post",
+                data: {
+                    wareLimit:row.wareLimit,
+                    skuCode:row.skuCode,
+                    storeCode:this.$route.params.storeCode
+
+                }
+            })
+                .then(data => {
+                    this.getSKUList(this.skuParams)
+                })
+        },
+        
+    }
+
+}
+</script>
+

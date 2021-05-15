@@ -1,45 +1,13 @@
 <template>
 <div class="function flex-center-Y">
-  <div>
-    <img v-show="!isHover1" src="../../../assets/super/set.png" alt="" style="margin-left:1.5vw;cursor:pointer;width:1.2vw;margin-top:2px" @mouseenter="isHover1=true">
-    <img v-show="isHover1" src="../../../assets/super/set-active.png" alt="" style="margin-left:1.5vw;cursor:pointer;width:1.2vw" @mouseout="isHover1=false">
-  </div>
-  <el-badge :value="update" class="item" v-if="update>0">
-  <img v-show="!isHover" src="../../../assets/super/user2.png" alt="" style="margin-left:1.5vw;width:1vw;cursor:pointer" @click.stop="show" @mouseenter="isHover=true">
-  <img v-show="isHover" src="../../../assets/super/user2-active.png" alt="" style="margin-left:1.5vw;width:1vw;cursor:pointer" @click.stop="show" @mouseout="isHover=false">
-  </el-badge>
-  <div v-else @click.stop="$router.push({path:'/updateLog'})">
-    <img v-show="!isHover" src="../../../assets/super/user2.png" alt="" style="margin-left:1.5vw;width:1vw;cursor:pointer" @mouseenter="isHover=true">
-    <img v-show="isHover" src="../../../assets/super/user2-active.png" alt="" style="margin-left:1.5vw;width:1vw;cursor:pointer" @mouseout="isHover=false">
-  </div>
   <div class="menu">
     <el-menu class="navbar" mode="horizontal">
-      <!-- <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger> -->
-      <!-- <breadcrumb></breadcrumb> -->
       <el-dropdown class="avatar-container" trigger="click">
-        <!-- <div class="flex-center" style="height:50px">
-          <img style="width:40px;height:40px" :src="avatar+'?imageView2/1/w/80/h/80'">
-          <span>&nbsp;{{nickname}}&nbsp;{{role}}&nbsp;</span>
-          <i class="el-icon-caret-bottom"></i>
-        </div> -->
         <div>
-          <img src="../../../assets/super/user4.png" alt="" style="width:1.8vw;cursor:pointer;">
+          <img src="../../../assets/super/user4.png" alt="" style="width:35px;cursor:pointer;">
         </div>
         <el-dropdown-menu class="user-dropdown center" slot="dropdown">
-          <!-- <router-link class="inlineBlock" to="/">
-            <el-dropdown-item>
-              首页
-            </el-dropdown-item>
-          </router-link> -->
           <el-dropdown-item>
-            <span @click="showDetail" style="display:block;">个人信息</span>
-          </el-dropdown-item>
-          <router-link class="inlineBlock" to="/system/setting" v-if="role=='运营经理'">
-            <el-dropdown-item>
-              运营商设置
-            </el-dropdown-item>
-          </router-link>
-          <el-dropdown-item divided>
             <span @click="logout" style="display:block;">退出</span>
           </el-dropdown-item>
         </el-dropdown-menu>
@@ -165,50 +133,9 @@ export default {
       'update'
     ])
   },
-  mounted(){ 
-    // this.$store.commit('SET_UPDATE', "666")
-    this.api({
-                url: "/notice/noticeNum",
-                method: "post",
-                data: {}
-            }).then(data => {
-                this.noticeNumWeb= data.noticeNumWeb
-                this.noticeNumPhone= data.noticeNumPhone
-                this.noticeNumAll= data.noticeNumAll
-                this.$store.commit('SET_UPDATE', data.noticeNumAll)//将更新总条数保存到state
-                if(this.noticeNumAll>0 && this.$route.path!="/dataScreen"){
-                  this.updateDialogVisible=true
-                }
-            })
-    this.getUpdateList()
+  mounted(){
   },
   methods: {
-    getUpdateList(){
-        this.api({
-                url: "/notice/noticeShow",
-                method: "post",
-                data: {
-                    noticeType:this.activeTab,
-                    pageRow:5,
-                    pageNum:1
-                }
-            }).then(data => {
-                this.updateList=data.list
-            })
-    },
-    getUpdateNum(){
-      // this.$store.commit('SET_UPDATE', "666")
-      this.api({
-                url: "/notice/noticeNum",
-                method: "post",
-                data: {}
-            }).then(data => {
-                this.noticeNumWeb= data.noticeNumWeb
-                this.noticeNumPhone= data.noticeNumPhone
-                this.noticeNumAll= data.noticeNumAll
-                this.$store.commit('SET_UPDATE', data.noticeNumAll)//将更新总条数保存到state
-            })
-    },
     toAll(){
       this.$router.push({path:"/updateLog"})
       this.updateDialogVisible=false
@@ -349,7 +276,6 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .function{height: 100%;}
-.menu{width:1.8vw;height: 1.8vw;margin-left: 1.5vw;}
 .user-dropdown{width: 120px;.el-dropdown-menu__item{font-size: 0.7vw;}}
 .flex-center{
     display: flex;

@@ -48,6 +48,7 @@ export default {
     -webkit-align-items: flex-end;
 }
 .justify-between{justify-content: space-between}
+.justify-center{justify-content: center}
 .justify-around{justify-content: space-around}
 .flex-1 {
     flex: 1;

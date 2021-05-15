@@ -93,43 +93,28 @@ img{width: 50px;height: 50px}
         <div class="top">
             <div class="button btn1" @click="addConfig"><i class="el-icon-plus"></i>&nbsp;添加配置</div>
             <el-tabs v-model="activeName" type="card" @tab-click="changeTab">
-                <el-tab-pane label="轮播图" name="0">
+                <el-tab-pane label="轮播图配置" name="0">
                 </el-tab-pane>
-                <el-tab-pane label="区块导航" name="1">
+                <!-- <el-tab-pane label="区块导航" name="1">
                 </el-tab-pane>
-                <!-- <el-tab-pane label="广告区块" name="2">
-                </el-tab-pane> -->
                 <el-tab-pane label="标签管理" name="3">
                 </el-tab-pane>
                 <el-tab-pane label="文章管理" name="4">
-                </el-tab-pane>
+                </el-tab-pane> -->
             </el-tabs>
         </div>
         <div class="container">
-        <!-- 文章搜索 -->
-        <div class="filt flex-center-Y" style="justify-content:flex-end;margin:20px 0" v-if="activeName=='4'">
-            <div class="flex-center-Y" style="justify-content:space-between;">
-                <div class="flex-center-Y" style="margin-right:20px">
-                    <div>主标题&nbsp;</div> 
-                    <el-input v-model="params.articleTheme" placeholder="请输入主标题"></el-input>
-                </div>
-                <div class="flex-center-Y" style="margin-right:20px">
-                    <div>副标题&nbsp;</div> 
-                    <el-input v-model="params.articleName" placeholder="请输入副标题"></el-input>
-                </div>
-                <div class="btn" @click="search">
-                    搜索
-                </div>
-            </div>
-        </div>
-        <!-- 文章搜索 -->
         <el-table
-            v-show="activeName=='0'"
             stripe
             :data="tableData"
             header-row-class-name="operatorTableStyle"
             cell-class-name="operatorCellStyle"
             style="width:100%">
+            <el-table-column
+            prop="wheelName"
+            label="名称"
+            align="center">
+            </el-table-column>
             <el-table-column
             prop="wheelPicture"
             label="图片"
@@ -141,20 +126,15 @@ img{width: 50px;height: 50px}
                 </template>
             </el-table-column>
             <el-table-column
-            prop="wheelAddress"
-            label="位置"
-            align="center">
-            </el-table-column>
-            <el-table-column
             prop="wheelRank"
             label="排序码"
             align="center">
             </el-table-column>
             <el-table-column
-            prop="name"
+            prop="linkName"
             label="跳转链接"
             align="center">
-                <template slot-scope="scope">
+                <!-- <template slot-scope="scope">
                      <el-popover placement="bottom"
                          trigger="hover">
                             <div slot="reference" class="title">
@@ -162,44 +142,15 @@ img{width: 50px;height: 50px}
                             </div>
                             <span>{{scope.row.urlType=='0'?scope.row.typeName:scope.row.jumpUrl}}</span>
                     </el-popover>
-                </template>
+                </template> -->
             </el-table-column>
             <el-table-column
-            prop="linkType"
+            prop="urlType"
             label="链接类型"
             align="center">
-                <template slot-scope="scope">
+                <!-- <template slot-scope="scope">
                     <span>{{scope.row.urlType=='0'?'内链接':'外链接'}}</span>
-                </template>
-            </el-table-column>
-            <el-table-column
-            prop="wheelName"
-            label="备注"
-            align="center">
-                <template slot-scope="scope">
-                     <el-popover placement="bottom"
-                         width="200"
-                         trigger="hover">
-                            <div slot="reference" class="title">
-                                {{scope.row.wheelName}}
-                            </div>
-                            <span>{{scope.row.wheelName}}</span>
-                    </el-popover>
-                </template>
-            </el-table-column>
-            <el-table-column label="上架"
-                             width="150"
-                             align="center">
-                <template slot-scope="scope">
-                    <el-switch
-                    @change="upWheelPlant(scope.row)"
-                    v-model="scope.row.plantingStatus"
-                    active-value="1"
-                    inactive-value="0"
-                    active-color="#409EFF"
-                    inactive-color="#BABABA">
-                    </el-switch>
-                </template>
+                </template> -->
             </el-table-column>
             <el-table-column label="操作"
                              width="150"
@@ -210,296 +161,6 @@ img{width: 50px;height: 50px}
                         编辑
                     </span>
                     <span @click="deleteWheelPlant(scope.row)"
-                          class="blue">
-                        删除
-                    </span>
-                </template>
-            </el-table-column>
-        </el-table>
-        <el-table
-            v-show="activeName=='1'"
-            stripe
-            :data="tableData"
-            header-row-class-name="operatorTableStyle"
-            cell-class-name="operatorCellStyle"
-            style="width:100%">
-            <el-table-column
-            prop="pictureUrl"
-            label="图片"
-            align="center">
-                <template slot-scope="scope">
-                    <div>
-                        <img :src="scope.row.pictureUrl" alt="">
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column
-            prop="orderId"
-            label="排序码"
-            align="center">
-            </el-table-column>
-            <el-table-column
-            prop="name"
-            label="跳转链接"
-            align="center">
-                <template slot-scope="scope">
-                     <el-popover placement="bottom"
-                         trigger="hover">
-                            <div slot="reference" class="title">
-                                {{scope.row.urlType=='0'?scope.row.name:scope.row.jumpUrl}}
-                            </div>
-                            <span>{{scope.row.urlType=='0'?scope.row.name:scope.row.jumpUrl}}</span>
-                    </el-popover>
-                </template>
-            </el-table-column>
-            <el-table-column
-            prop="linkType"
-            label="链接类型"
-            align="center">
-                <template slot-scope="scope">
-                    <span>{{scope.row.urlType=='0'?'内链接':'外链接'}}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作"
-                             width="150"
-                             align="center">
-                <template slot-scope="scope">
-                    <span @click="updateArticle(scope.row)"
-                          class="blue">
-                        编辑
-                    </span>
-                    <span @click="deleteDiv(scope.row)"
-                          class="blue">
-                        删除
-                    </span>
-                </template>
-            </el-table-column>
-        </el-table>
-        <el-table
-            v-show="activeName=='2'"
-            stripe
-            :data="tableData"
-            header-row-class-name="operatorTableStyle"
-            cell-class-name="operatorCellStyle"
-            style="width:100%">
-            <el-table-column
-            prop="wheelPicture"
-            label="内容展示图"
-            align="center">
-                <template slot-scope="scope">
-                    <div>
-                        <img :src="scope.row.wheelPicture" alt="">
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column
-            prop="wheelPicture"
-            label="微信分享图"
-            align="center">
-                <template slot-scope="scope">
-                    <div>
-                        <img :src="scope.row.wheelPicture" alt="">
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column
-            prop="wheelRank"
-            label="排序码"
-            align="center">
-            </el-table-column>
-            <el-table-column
-            prop="jumpUrl"
-            label="跳转链接"
-            align="center">
-                <template slot-scope="scope">
-                     <el-popover placement="bottom"
-                         trigger="hover">
-                            <div slot="reference" class="title">
-                                {{scope.row.linkName}}
-                            </div>
-                            <span>{{scope.row.linkName}}</span>
-                    </el-popover>
-                </template>
-            </el-table-column>
-            <el-table-column
-            prop="linkType"
-            label="链接类型"
-            align="center">
-            </el-table-column>
-            <el-table-column label="操作"
-                             width="150"
-                             align="center">
-                <template slot-scope="scope">
-                    <span @click="updateArticle(scope.row)"
-                          class="blue">
-                        编辑
-                    </span>
-                    <span @click="deleteAdv(scope.row)"
-                          class="blue">
-                        删除
-                    </span>
-                </template>
-            </el-table-column>
-        </el-table>
-        <el-table
-            v-show="activeName=='3'"
-            stripe
-            :data="tableData"
-            header-row-class-name="operatorTableStyle"
-            cell-class-name="operatorCellStyle"
-            style="width:100%">
-            <el-table-column
-            prop="labelName"
-            label="名称"
-            align="center">
-            </el-table-column>
-            <el-table-column
-            prop="labelRank"
-            label="排序码"
-            align="center">
-            </el-table-column>
-            <el-table-column label="上架"
-                             width="150"
-                             align="center">
-                <template slot-scope="scope">
-                    <el-switch
-                    v-model="scope.row.labelStatus"
-                    @change="upWheelPlant(scope.row)"
-                    active-value="1"
-                    inactive-value="0"
-                    active-color="#409EFF"
-                    inactive-color="#BABABA">
-                    </el-switch>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作"
-                             width="150"
-                             align="center">
-                <template slot-scope="scope">
-                    <span @click="updateArticle(scope.row)"
-                          class="blue">
-                        编辑
-                    </span>
-                    <span @click="deleteLab(scope.row)"
-                          class="blue">
-                        删除
-                    </span>
-                </template>
-            </el-table-column>
-        </el-table>
-        <el-table
-            v-show="activeName=='4'"
-            stripe
-            :data="tableData"
-            header-row-class-name="operatorTableStyle"
-            cell-class-name="operatorCellStyle"
-            style="width:100%">
-            <el-table-column
-                prop="articlePicture"
-                label="图片"
-                align="center">
-                    <template slot-scope="scope">
-                        <div>
-                            <img :src="scope.row.articlePicture" alt="">
-                        </div>
-                    </template>
-            </el-table-column>
-            <el-table-column
-            prop="articleTheme"
-            label="主标题"
-            align="center">
-                <template slot-scope="scope">
-                     <el-popover placement="right"
-                         width="200"
-                         trigger="hover">
-                            <div slot="reference" class="title">
-                                {{scope.row.articleTheme}}
-                            </div>
-                            <span>{{scope.row.articleTheme}}</span>
-                    </el-popover>
-                </template>
-            </el-table-column>
-            <el-table-column
-            prop="articleName"
-            label="副标题"
-            align="center">
-                <template slot-scope="scope">
-                     <el-popover placement="right"
-                         width="200"
-                         trigger="hover">
-                            <div slot="reference" class="title">
-                                {{scope.row.articleName}}
-                            </div>
-                            <span>{{scope.row.articleName}}</span>
-                    </el-popover>
-                </template>
-            </el-table-column>
-            <el-table-column
-            prop="labelName"
-            label="标签"
-            align="center">
-            </el-table-column>
-            <el-table-column
-            prop="allRank"
-            label="排序码"
-            align="center">
-            </el-table-column>
-            <el-table-column
-            prop="articleLink"
-            label="跳转链接"
-            align="center">
-                <template slot-scope="scope">
-                     <el-popover placement="bottom"
-                         trigger="hover">
-                            <div slot="reference" class="title">
-                                {{scope.row.articleLink}}
-                            </div>
-                            <span>{{scope.row.articleLink}}</span>
-                    </el-popover>
-                </template>
-            </el-table-column>
-            <el-table-column
-            prop="articleUser"
-            label="阅读量"
-            align="center">
-            </el-table-column>
-            <el-table-column label="上架"
-                             width="150"
-                             align="center">
-                <template slot-scope="scope">
-                    <el-switch
-                    v-model="scope.row.articleStatus"
-                    @change="upWheelPlant(scope.row)"
-                    active-value="1"
-                    inactive-value="0"
-                    active-color="#409EFF"
-                    inactive-color="#BABABA">
-                    </el-switch>
-                </template>
-            </el-table-column>
-            <el-table-column label="推荐"
-                             width="150"
-                             align="center">
-                <template slot-scope="scope">
-                    <el-switch
-                    v-model="scope.row.homeStatus"
-                    @change="upWheelPlant(scope.row)"
-                    active-value="1"
-                    inactive-value="0"
-                    active-color="#409EFF"
-                    inactive-color="#BABABA">
-                    </el-switch>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作"
-                             width="150"
-                             align="center">
-                <template slot-scope="scope">
-                    <span @click="updateArticle(scope.row)"
-                          class="blue">
-                        编辑
-                    </span>
-                    <span @click="deleteArticle(scope.row)"
                           class="blue">
                         删除
                     </span>
@@ -527,13 +188,17 @@ img{width: 50px;height: 50px}
             width="600px">
             <div class="kupperDialog">
                 <!-- <div class="title">{{dialogTitle}}</div> -->
-                <div class="flex-center-Y smallMt">
+                <!-- <div class="flex-center-Y smallMt">
                     <div class="W-50"><span class="red">*</span>区域</div>
                     <div class="W-50 flex-center-Y"> <el-radio></el-radio>首页</div>
                 </div>
                 <div class="flex-center-Y smallMt">
                     <div class="W-50"><span class="red">*</span>位置</div>
                     <div class="W-50 flex-center-Y"> <el-radio></el-radio> 轮播图</div>
+                </div> -->
+                <div class="flex-center-Y smallMt">
+                    <div class="W-50"><span class="red">*</span>轮播图名称</div>
+                    <div class="W-50 flex-center-Y"><el-input v-model="selectData.wheelName" placeholder="请输入轮播图名称"></el-input></div>
                 </div>
                 <div class="flex-center-Y smallMt">
                     <div class="W-50"><span class="red">*</span>图片
@@ -564,14 +229,14 @@ img{width: 50px;height: 50px}
                         </el-select>
                     </div>
                 </div>
-                <div class="flex-center-Y smallMt" v-if="selectData.urlType=='1'">
+                <div class="flex-center-Y smallMt" v-if="selectData.urlType=='外链' || selectData.urlType=='1'">
                     <div class="W-50"><span class="red">*</span>跳转链接</div>
                     <div class="W-50 flex-center-Y"><el-input v-model="selectData.jumpUrl" placeholder="请输入跳转链接"></el-input></div>
                 </div>
-                <div class="flex-center-Y smallMt" v-if="selectData.urlType=='0'">
+                <div class="flex-center-Y smallMt" v-if="selectData.urlType=='内链' || selectData.urlType=='0'">
                     <div class="W-50"><span class="red">*</span>跳转链接</div>
                     <div class="W-50 flex-center-Y">
-                        <el-select v-model="selectData.jumpUrl" placeholder="请选择">
+                        <el-select v-model="selectData.jumpUrl" placeholder="请选择" @change="changeUrl">
                             <el-option 
                             v-for="(item,i) in linkList"
                             :key="i"
@@ -581,9 +246,9 @@ img{width: 50px;height: 50px}
                         </el-select>
                     </div>
                 </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>备注</div>
-                    <div class="W-50 flex-center-Y"><el-input maxlength="24" type="textarea" v-model="selectData.wheelName" placeholder="请输入备注描述，不超过24字"></el-input></div>
+                <div class="flex-center-Y smallMt" v-if="selectData.urlType=='外链' || selectData.urlType=='1'">
+                    <div class="W-50"><span class="red">*</span>外链接名称</div>
+                    <div class="W-50 flex-center-Y"><el-input maxlength="24" type="textarea" v-model="selectData.linkName" placeholder="请输入外链接描述"></el-input></div>
                 </div>
                 <div class="bottom flex-center-Y justify-center" style="margin-top:40px">
                     <div class="btn1" @click="backIndex">取消</div>
@@ -591,230 +256,6 @@ img{width: 50px;height: 50px}
                 </div>
             </div>
         </el-dialog>
-        <!-- 标签弹窗 -->
-        <el-dialog
-            :visible.sync="labVisible"
-            :close-on-click-modal="false"
-            :show-close="false"
-            custom-class="KupperdialogClass"
-            width="600px"
-            :title="dialogTitle">
-            <div class="kupperDialog">
-                <!-- <div class="title">{{dialogTitle}}</div> -->
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>区域</div>
-                    <div class="W-50 flex-center-Y"> <el-radio></el-radio>标签</div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>标签名称</div>
-                    <div class="W-50 flex-center-Y"><el-input v-model="labData.labelName" placeholder="请输入标签名称"></el-input></div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>排序码</div>
-                    <div class="W-50 flex-center-Y"><el-input type="number" v-model="labData.labelRank" placeholder="排序码必须为整数"></el-input></div>
-                </div>
-                <div class="bottom flex-center-Y justify-center" style="margin-top:40px">
-                    <div class="btn1" @click="backlab">取消</div>
-                    <div class="btn" @click="savelab">确定</div>
-                </div>
-            </div>
-        </el-dialog>
-        <!-- 文章弹窗 -->
-        <el-dialog
-            :visible.sync="articleVisible"
-            :close-on-click-modal="false"
-            :show-close="false"
-            custom-class="KupperdialogClass"
-            width="600px"
-            :title="dialogTitle">
-            <div class="kupperDialog">
-                <!-- <div class="title">{{dialogTitle}}</div> -->
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>区域</div>
-                    <div class="W-50 flex-center-Y"> <el-radio></el-radio>文章</div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>标签</div>
-                    <div class="W-50">
-                    <el-select v-model="articleData.articleType" placeholder="请选择">
-                        <el-option
-                        v-for="item in labList"
-                        :key="item.labelId"
-                        :label="item.labelName"
-                        :value="item.labelId">
-                        </el-option>
-                    </el-select>
-                    </div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>图片
-                        <div class="minifont" style="color:#FF0000">图片文件大小不超过2M;</div>
-                        <div class="minifont" style="color:#FF0000">图片尺寸建议335*140;</div>
-                        <div class="minifont" style="color:#FF0000">图片格式为png格式;</div>
-                    </div>
-                    <el-upload
-                    class="avatar-uploader"
-                    :before-upload="beforeAvatarUpload"
-                    :http-request="upload"
-                    action=""
-                    :show-file-list="false">
-                    <img v-if="articleData.articlePic || articleData.articlePicture" :src="articleData.articlePicture" class="avatar">
-                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>主标题</div>
-                    <div class="W-50 flex-center-Y"><el-input maxlength="18" type="textarea" v-model="articleData.articleTheme" placeholder="请输入主标题，不超过18字"></el-input></div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>副标题</div>
-                    <div class="W-50 flex-center-Y"><el-input maxlength="48" type="textarea" v-model="articleData.articleName" placeholder="请输入主标题，不超过48字"></el-input></div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>跳转链接</div>
-                    <div class="W-50 flex-center-Y"><el-input v-model="articleData.articleLink" placeholder="请输入跳转链接"></el-input></div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>排序码</div>
-                    <div class="W-50 flex-center-Y"><el-input type="number" v-model="articleData.allRank" placeholder="排序码必须为整数"></el-input></div>
-                </div>
-                
-                <div class="bottom flex-center-Y justify-center" style="margin-top:40px">
-                    <div class="btn1" @click="backArticle">取消</div>
-                    <div class="btn" @click="saveArticle">确定</div>
-                </div>
-            </div>
-        </el-dialog>
-        <!-- 区块导航弹窗 -->
-        <el-dialog
-            :visible.sync="divVisible"
-            :close-on-click-modal="false"
-            :show-close="false"
-            custom-class="KupperdialogClass"
-            :title="dialogTitle"
-            width="600px">
-            <div class="kupperDialog">
-                <!-- <div class="title">{{dialogTitle}}</div> -->
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>区域</div>
-                    <div class="W-50 flex-center-Y"> <el-radio></el-radio>首页</div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>位置</div>
-                    <div class="W-50 flex-center-Y"> <el-radio></el-radio> 区块导航</div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>图片
-                        <div class="minifont" style="color:#FF0000">图片文件大小不超过2M;</div>
-                        <div class="minifont" style="color:#FF0000">图片尺寸建议165*75;</div>
-                        <div class="minifont" style="color:#FF0000">图片格式为png格式;</div>
-                    </div>
-                    <el-upload
-                    class="avatar-uploader"
-                    :before-upload="beforeAvatarUpload"
-                    :http-request="upload"
-                    action=""
-                    :show-file-list="false">
-                    <img v-if="divData.picUrl || divData.pictureUrl" :src="divData.pictureUrl" class="avatar">
-                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>排序码</div>
-                    <div class="W-50 flex-center-Y"><el-input v-model="divData.orderId" type="number" placeholder="排序码必须为整数"></el-input></div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>链接类型</div>
-                    <div class="W-50 flex-center-Y">
-                        <el-select v-model="divData.urlType" placeholder="请选择">
-                            <el-option label="内链接" value="0"></el-option>
-                            <el-option label="外链接" value="1"></el-option>
-                        </el-select>
-                    </div>
-                </div>
-                <div class="flex-center-Y smallMt" v-if="divData.urlType=='1'">
-                    <div class="W-50"><span class="red">*</span>跳转链接</div>
-                    <div class="W-50 flex-center-Y"><el-input v-model="divData.jumpUrl" placeholder="请输入跳转链接"></el-input></div>
-                </div>
-                <div class="flex-center-Y smallMt" v-if="divData.urlType=='0'">
-                    <div class="W-50"><span class="red">*</span>跳转链接</div>
-                    <div class="W-50 flex-center-Y">
-                        <el-select v-model="divData.jumpUrl" placeholder="请选择">
-                            <el-option 
-                            v-for="(item,i) in linkList"
-                            :key="i"
-                            :label="item.name" 
-                            :value="item.url"
-                            ></el-option>
-                        </el-select>
-                    </div>
-                </div>
-                <!-- <div class="tip" style="color:#FF0000">注：区块导航默认按照排序码前3个区块展示</div> -->
-                <div class="bottom flex-center-Y justify-center" style="margin-top:40px">
-                    <div class="btn1" @click="backDiv">取消</div>
-                    <div class="btn" @click="saveDiv">确定</div>
-                </div>
-            </div>
-        </el-dialog>
-        <!-- 广告区块弹窗 -->
-        <!-- <el-dialog
-            :visible.sync="advVisible"
-            :close-on-click-modal="false"
-            :show-close="false"
-            custom-class="KupperdialogClass"
-            :title="dialogTitle"
-            width="600px">
-            <div class="kupperDialog">
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>区域</div>
-                    <div class="W-50 flex-center-Y"> <el-radio></el-radio>首页</div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>位置</div>
-                    <div class="W-50 flex-center-Y"> <el-radio></el-radio> 广告区块</div>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>内容展示图片
-                        <div class="minifont" style="color:#FF0000">图片文件大小不超过2M;</div>
-                        <div class="minifont" style="color:#FF0000">图片尺寸建议335*180;</div>
-                        <div class="minifont" style="color:#FF0000">图片格式为png格式;</div>
-                    </div>
-                    <el-upload
-                    class="avatar-uploader"
-                    :before-upload="beforeAvatarUpload"
-                    :http-request="upload"
-                    action=""
-                    :show-file-list="false">
-                    <img v-if="divData.picUrl || divData.pictureUrl" :src="divData.pictureUrl" class="avatar">
-                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>微信分享图片
-                        <div class="minifont" style="color:#FF0000">图片文件大小不超过2M;</div>
-                        <div class="minifont" style="color:#FF0000">图片尺寸建议335*180;</div>
-                        <div class="minifont" style="color:#FF0000">图片格式为png格式;</div>
-                    </div>
-                    <el-upload
-                    class="avatar-uploader"
-                    :before-upload="beforeAvatarUpload"
-                    :http-request="upload"
-                    action=""
-                    :show-file-list="false">
-                    <img v-if="divData.wheelPic || divData.wheelPicture" :src="divData.wheelPicture" class="avatar">
-                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
-                </div>
-                <div class="flex-center-Y smallMt">
-                    <div class="W-50"><span class="red">*</span>排序码</div>
-                    <div class="W-50 flex-center-Y"><el-input v-model="divData.wheelRank" type="number" placeholder="排序码必须为整数"></el-input></div>
-                </div>
-                <div class="bottom flex-center-Y justify-center" style="margin-top:40px">
-                    <div class="btn1" @click="backAdv">取消</div>
-                    <div class="btn" @click="saveAdv">确定</div>
-                </div>
-            </div>
-        </el-dialog> -->
     </div>
 </template>
 <script>
@@ -830,7 +271,7 @@ export default {
             totalCount: 0,
             activeName:"0",
             linkList:[
-                {name:"咖啡文化",linkId:1,linkUrl:"../pages/culture/culture"}
+                {name:"咖啡文化",linkId:1,url:"../pages/culture/culture"}
             ],
             // 轮播
             indexVisible:false,
@@ -883,6 +324,13 @@ export default {
         this.getUrlList()
     },
     methods:{
+        changeUrl(value){
+            this.linkList.forEach(item=>{
+                if(item.url==value){
+                    this.selectData.linkName=item.name
+                }
+            })
+        },
         search(){
             this.params.pageNum=1
             this.getList()
@@ -898,7 +346,7 @@ export default {
             this.listLoading = true;
             if(this.activeName=='0'){
                 this.api({
-                    url: "/kupper/plant/showPlantingList",
+                    url: "/showPlantingList",
                     method: "post",
                     data: this.params
                 }).then(data => {
@@ -1023,38 +471,22 @@ export default {
         // 上传图片
         updateArticle(row){//修改
             this.dialogTitle="修改配置"
-            if(this.activeName=='0'){
-                this.indexVisible=true
-                this.selectData=row
-            }else if(this.activeName=='1'){ //区块导航
-                this.divVisible=true
-                this.divData=row
-            }else if(this.activeName=='2'){ //广告
-                this.advVisible=true
-                this.advData=row
-            }else if(this.activeName=='3'){ //标签
-                this.labVisible=true
-                this.labData=row
-            }else if(this.activeName=='4'){ //文章
-                this.articleVisible=true
-                this.articleData=row
-            }
+            this.indexVisible=true
+            this.api({
+                    url: "/updateWheelPlantShow",
+                    method: "post",
+                    data: {
+                        plantingId:row.plantingId
+                    }
+                }).then(data => {
+                    this.selectData=row
+                });
             
             
         },
         addConfig(){//新建
             this.dialogTitle="添加配置"
-            if(this.activeName=='0'){
             this.indexVisible=true
-            }else if(this.activeName=='1'){ //区块导航
-            this.divVisible=true
-            }else if(this.activeName=='2'){ //广告
-            this.advVisible=true
-            }else if(this.activeName=='3'){ //标签
-            this.labVisible=true
-            }else if(this.activeName=='4'){ //文章
-            this.articleVisible=true
-            }
         },
         backIndex(){
             this.indexVisible=false
@@ -1095,7 +527,7 @@ export default {
             if(this.activeName=='0'){
             this.selectData=row
             this.api({
-                    url: "/kupper/plant/updateWheelPlant",
+                    url: "/updateWheelPlant",
                     method: "post",
                     data:this.selectData
                 }).then(data => {
@@ -1123,41 +555,49 @@ export default {
         },
         saveIndex(){
             this.selectData.typeName=""
-            if(!this.selectData.wheelPicture || !this.selectData.wheelAddress || !this.selectData.wheelRank || !this.selectData.jumpUrl || !this.selectData.urlType){
+            this.selectData.wheelPicture="temp-dir/52bf8e9c.png"
+            console.log(this.selectData)
+            if(!this.selectData.wheelPicture || !this.selectData.wheelName || !this.selectData.wheelRank || !this.selectData.jumpUrl || !this.selectData.urlType){
                 this.$message.error('请将上述信息填写完整哦~');
                 return;
+            }
+            if(this.selectData.urlType=='内链'){
+                this.selectData.urlType='0'
+            }
+            if(this.selectData.urlType=='外链'){
+                this.selectData.urlType='1'
             }
             this.selectData.wheelPicture=this.selectData.wheelPic ? this.selectData.wheelPic : this.selectData.wheelPicture
             if(this.dialogTitle=="添加配置"){
             this.api({
-                    url: "/kupper/plant/addWheelPlant",
+                    url: "/addWheelPlant",
                     method: "post",
                     data:this.selectData
                 }).then(data => {
                     this.$message.success('添加成功!');
                     this.indexVisible=false
                     this.getList()
-                    this.selectData.wheelAddress="0"
                     this.selectData.wheelRank=""
                     this.selectData.jumpUrl=""
                     this.selectData.wheelName=""
                     this.selectData.urlType="0"
                     this.selectData.wheelPicture=""
+                    this.selectData.linkName=""
                 });}else{
                     this.api({
-                    url: "/kupper/plant/updateWheelPlant",
+                    url: "/updateWheelPlant",
                     method: "post",
                     data:this.selectData
                 }).then(data => {
                     this.$message.success('保存成功!');
                     this.indexVisible=false
                     this.getList()
-                    this.selectData.wheelAddress="0"
                     this.selectData.wheelRank=""
                     this.selectData.jumpUrl=""
                     this.selectData.wheelName=""
                     this.selectData.urlType="0"
                     this.selectData.wheelPicture=""
+                    this.selectData.linkName=""
                 });
                 }
         },
@@ -1276,7 +716,7 @@ export default {
                 type: 'warning'
                 }).then(() => {
                 this.api({
-                    url: "/kupper/plant/deleteWheelPlant",
+                    url: "/deleteWheelPlant",
                     method: "post",
                     data: {plantingId:row.plantingId}
                 }).then(data => {

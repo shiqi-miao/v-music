@@ -111,7 +111,7 @@ $red: #ff1b11;
           transform: translateY(-50%)
         }
 }
-.user{position: absolute;right:2vw;top: 0;width: 9vw;height: 100%;}
+.user{position: absolute;right:2vw;top: 0;width: 4vw;height: 100%;}
 </style>
 <style>
 .v-modal{z-index: 200!important;}
@@ -161,7 +161,8 @@ $red: #ff1b11;
                     width:50%;
                     height:2%;
                     background-color: #409EFF;
-                    left: 0
+                    left: 50%;
+                    transform: translateX(-50%);
 }
 
 

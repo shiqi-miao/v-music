@@ -115,7 +115,7 @@
 #shop >>> .el-input-number{line-height:30px}
 #shop >>> .el-select,#shop >>> .el-select .el-input{width:100%}
 </style>
-<style lang="scss">
+<style scoped lang="scss">
 .userTableStyle{color: #333}
 .userTableStyle th>.cell{font-weight: 400}
 .userTableStyle{color: #333;height: 75px;padding: 0!important}
@@ -196,134 +196,7 @@
                   style="width: 100%"
                   v-loading.body="listLoading"
                   element-loading-text="拼命加载中"
-                  @row-click="clickTable"
-                  ref="refTable"
-                  @sort-change="sortMethod"
-                  @filter-change="filterMethod"
-                  @expand-change="expandChange"
-                  @cell-click="setAlert"
-                  row-key="skuCode"
-                  :expand-row-keys="expands">
-            <el-table-column type="expand">
-                <template slot-scope="props">
-                    <el-table :data="batchList" style="width: 100%" header-row-class-name="userTableStyle" cell-class-name="userCellStyle">
-                        <el-table-column width="500" label="保质期类型" align="center">
-                            <!-- <template slot="header" slot-scope="scope">
-                                <div id="period">
-                                    <el-select v-model="productionStatus" placeholder="请选择">
-                                        <el-option
-                                        v-for="item in periodoptions"
-                                        :key="item.value"
-                                        :label="item.label"
-                                        :value="item.value">
-                                        </el-option>
-                                    </el-select>
-                                </div>
-                            </template> -->
-                            <template slot-scope="scope">
-                                <el-row>
-                                    <el-col :span="8">
-                                        <div id="period">
-                                            <el-select v-model="scope.row.productionStatus" v-if="scope.row.showEdit" placeholder="请选择">
-                                                <el-option
-                                                v-for="item in periodoptions"
-                                                :key="item.value"
-                                                :label="item.label"
-                                                :value="item.value">
-                                                </el-option>
-                                            </el-select>
-                                            <span v-if="!scope.row.showEdit && scope.row.productionStatus=='0'">按生产日期</span>
-                                            <span v-if="!scope.row.showEdit && scope.row.productionStatus=='1'">按过保日期</span>
-                                            <span v-if="!scope.row.showEdit && scope.row.productionStatus=='2'">无保质期</span>
-                                        </div>
-                                    </el-col>
-                                    <el-col :span="8">
-                                        <el-date-picker
-                                            v-if="scope.row.productionStatus=='0'"
-                                            v-model="scope.row.gmtProduction"
-                                            type="date"
-                                            value-format="yyyy-MM-dd"
-                                            format="yyyy-MM-dd"
-                                            placeholder="选择生产日期"
-                                            :picker-options="pickerOptions0">
-                                        </el-date-picker>
-                                    </el-col>
-                                    <el-col :span="8">
-                                        <div class="flex-center-Y">
-                                            <div>
-                                                <el-input v-model="scope.row.productionDate" placeholder="请输入保质期" type="number" v-if="scope.row.productionStatus=='0'"></el-input>
-                                            </div>
-                                            <div>
-                                                <span  v-if="scope.row.productionStatus=='0'">&nbsp;天</span>
-                                            </div>
-                                            
-                                        </div>
-                                        
-                                        <!-- <el-select v-model="scope.row.productionDate" placeholder="选择保质期"  v-if="scope.row.productionStatus=='0'">
-                                                <el-option
-                                                v-for="(item,index) in qualityoptions"
-                                                :key="index"
-                                                :label="item.label"
-                                                :value="item.value">
-                                                </el-option>
-                                        </el-select>  -->
-                                    </el-col> 
-                                    <el-col :span="8">
-                                        <el-date-picker
-                                            v-if="scope.row.productionStatus=='1'"
-                                            v-model="scope.row.outWarrantyTime"
-                                            type="date"
-                                            value-format="yyyy-MM-dd"
-                                            format="yyyy-MM-dd"
-                                            placeholder="选择过保日期 "
-                                            :picker-options="pickerOptions01">
-                                        </el-date-picker>
-                                    </el-col> 
-                                </el-row>
-                                    
-                            </template>
-                        </el-table-column>
-                        <el-table-column style="width: 18%"
-                                         label="可用库存"
-                                         align="center">
-                             <template slot-scope="scope">
-                                 <el-input-number v-model="scope.row.residueNum" :min="1" label="描述文字" v-if="scope.row.showEdit"></el-input-number>
-                                 <span v-else>{{scope.row.residueNum}}</span>
-                             </template>
-                         </el-table-column>
-                         
-                        <el-table-column label="成本价"
-                                        style="width: 18%"
-                                        align="center">
-                            <template slot-scope="scope">
-                                <el-input v-model="scope.row.purchasePrice" type="number"  v-if="scope.row.showEdit"></el-input>
-                                <span v-else>{{scope.row.purchasePrice}}</span>
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="库存价值"
-                                        style="width: 18%"
-                                        align="center">
-                            <template slot-scope="scope">
-                                <span>￥{{scope.row.allPurchasePrice}}</span>
-                                <!-- <el-input v-model="scope.row.allPurchasePrice"></el-input> -->
-                            </template>
-                        </el-table-column>
-                        <el-table-column 
-                                label="操作"
-                                width="150"
-                                align="center"
-                                >
-                            <template slot-scope="scope">
-                                <i class="el-icon-circle-check" style="color:#67C23A;cursor:pointer" @click="commitAdd(scope.row)" v-if="scope.row.showCommit"></i>
-                                <i class="el-icon-delete blue" @click="delbatch(scope.row)"></i>
-                                <!-- <i class="el-icon-edit" style="color:#E6A23C;cursor:pointer" @click="showedit(scope.row)" v-if="!scope.row.showEdit"></i> -->
-                                <i class="el-icon-circle-check" style="color:#67C23A;cursor:pointer" @click="editbatch(scope.row)" v-if="scope.row.showEdit && showshow"></i>
-                            </template>
-                            
-                        </el-table-column>
-                    </el-table>
-                </template>
-            </el-table-column>
+                  ref="refTable">
             <el-table-column prop="skuPicture"
                              label="商品图片"
                              align="center">
@@ -756,12 +629,6 @@
             <div class="line flex-center-Y">
                 <div class="label">排序码</div>
                 <div class="input"><el-input v-model="form.orderNum" type="number" placeholder="排序码必须为整数"></el-input></div>
-            </div>
-            <div class="line flex-center-Y">
-                <div class="label">盲盒二维码</div>
-                <div class="input" style="width:80%">
-                    https://h5.bud88.com/?skuCodeBox={{form.skuCodeBox}}
-                </div>
             </div>
             <div class="bottom flex-center-Y justify-center">
                 <div class="btn1" @click="editVisible = false">取消</div>

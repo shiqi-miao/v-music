@@ -24,24 +24,20 @@ module.exports = {
   dev: {
     env: require('./dev.env'),
     host: '192.168.1.73',
-    port: 9520,
+    port: 9528,
     autoOpenBrowser: true,
     autoOpenPage: '/login',
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api': {
-        // target: 'https://m.robooot.com:1443/seedling-merchant',
-        // target: 'https://test.robooot.com:1443/seedling-merchant',
-        // target: 'http://192.168.0.2:8182/seedling-merchant',
-        // target: 'http://192.168.1.204:8182/seedling-merchant',
-        target: 'http://192.168.2.69:8182/seedling-merchant',
+      '/support': {
+        target: 'http://192.168.1.214:8181',
+        logLevel:'debug',
         pathRewrite: {
-          '^/api': '/'
+          '^/support': '/support/api'
         }
       }
     },
-    // devtool:"eval-source-map",//断点调试
     // cacheBusting: false,
     cssSourceMap: false
   }

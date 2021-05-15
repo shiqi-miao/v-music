@@ -61,19 +61,19 @@ const user = {
     Login({commit, state}, loginForm) {
       return new Promise((resolve, reject) => {   
         api({
-          url: "login/seedling",
+          url: "/login",
           method: "post",
           data: loginForm
         }).then(data => {
-          // if (data.result === "success") {
-          //   //cookie中保存前端登录状态
-          //   setToken();
-          // }
-          if (data.flag) {
+          if (data==true) {
             //cookie中保存前端登录状态
-            // commit("SET_TOKEN", data.token);
-            setToken(data.token);
+            setToken('123')
           }
+          // if (data.flag) {
+          //   //cookie中保存前端登录状态
+          //   // setToken(data.token);
+          //   setToken('123');
+          // }
           resolve(data);
         }).catch(err => {
           reject(err)

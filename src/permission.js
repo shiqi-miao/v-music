@@ -3,7 +3,7 @@ import store from './store';
 import NProgress from 'nprogress'; // Progress 进度条
 import 'nprogress/nprogress.css'; // Progress 进度条样式
 import { getToken } from '@/utils/seedling'; // 验权
-const whiteList = ['/login', '/404', '/video','/videonew','/showDataScreen','/showMap']; //白名单,不需要登录的路由
+const whiteList = ['/login', '/404']; //白名单,不需要登录的路由
 router.beforeEach((to, from, next) => {
   NProgress.start();
   if (getToken()) {
@@ -11,57 +11,14 @@ router.beforeEach((to, from, next) => {
     if (to.path === '/login') {
       next({ path: '/' });
       NProgress.done(); // 结束Progress
-    } else if (!store.getters.userId) {
-      store.dispatch('GetInfo').then(() => {
-        if (store.getters.permission != 1) {
-          if (to.path != '/identify') {
-            next({ path: '/identify' });
-            NProgress.done(); // 结束Progress
-            return;
-          } else {
-            // NProgress.done()
-          }
-        } else if (!(store.getters.ownerNum > 0)) {
-          if (to.path != '/bind') {
-            next({ path: '/bind' });
-            NProgress.done(); // 结束Progress
-            return;
-          } else {
-            // next({ path: '/' })
-            // NProgress.done() // 结束Progress
-            // return
-          }
-        }
-        // else if (store.getters.status==1){
-        //   next({ path: '/super' })
-        //   return
-        // }
-        next({ ...to });
-      });
+    // } else if (!store.getters.userId) {//获取用户权限
+    //   store.dispatch('GetInfo').then(() => {
+    //     next({ ...to });
+    //   });
     } else {
-      if (store.getters.permission != 1) {
-        if (to.path != '/identify') {
-          next({ path: '/identify' });
-          NProgress.done(); // 结束Progress
-          return;
-        } else {
-          // NProgress.done()
-        }
-      } else if (!(store.getters.ownerNum > 0)) {
-        if (to.path != '/bind') {
-          next({ path: '/bind' });
-          NProgress.done(); // 结束Progress
-          return;
-        } else {
-          // NProgress.done()
-        }
-      }
       next();
     }
   } else if (whiteList.indexOf(to.path) !== -1) {
-    //如果前往的路径是白名单内的,就可以直接前往
-    next();
-  } else if (to.path.indexOf('/test') !== -1) {
     //如果前往的路径是白名单内的,就可以直接前往
     next();
   } else {

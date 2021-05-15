@@ -53,7 +53,7 @@
   }
 .grey{color: #e6e6e6}
 .red{color: red;}
-.button{height: 36px;line-height: 36px;cursor: pointer;z-index: 10;position: absolute;right: 20px;top: 20px;margin-right: 0!important;}
+.button{height: 36px;line-height: 36px;cursor: pointer;z-index: 10;position: absolute;top: 20px;}
 .btn,.btn1{width:100px;height: 36px;line-height: 36px;color: #fff;background:#409EFF;text-align: center;cursor: pointer;border-radius:4px;font-size:14px;justify-content: center;}
 .btn1{color:#409EFF;background:#ffffff;cursor: pointer;border: 1px solid #409EFF;margin-right:60px}
 .el-upload__tip{color: #D8D8D8;font-weight: 400}
@@ -91,17 +91,17 @@ img{width: 50px;height: 50px}
 <template>
     <div class="app-container" id="kupper">
         <div class="top">
-            <div class="button btn1" @click="addConfig"><i class="el-icon-plus"></i>&nbsp;添加配置</div>
-            <el-tabs v-model="activeName" type="card" @tab-click="changeTab">
+            <div class="button btn" @click="addConfig">添加配置</div>
+            <!-- <el-tabs v-model="activeName" type="card" @tab-click="changeTab">
                 <el-tab-pane label="轮播图配置" name="0">
                 </el-tab-pane>
-                <!-- <el-tab-pane label="区块导航" name="1">
+                <el-tab-pane label="区块导航" name="1">
                 </el-tab-pane>
                 <el-tab-pane label="标签管理" name="3">
                 </el-tab-pane>
                 <el-tab-pane label="文章管理" name="4">
-                </el-tab-pane> -->
-            </el-tabs>
+                </el-tab-pane>
+            </el-tabs> -->
         </div>
         <div class="container">
         <el-table
@@ -447,24 +447,13 @@ export default {
             var formData = new FormData();
             formData.append("file", content.file);
             this.api({
-                url: "/uploadfile/upload",
+                url: "/uploadfile/uploadPic",
                 method: "post",
                 data: formData
             })
                 .then(data => {
-                    if(this.activeName=='0'){ 
                     this.selectData.wheelPicture=data.filePath
                     this.selectData.wheelPic=data.tempPath
-                    }else if(this.activeName=='1'){ //区块导航
-                    this.divData.pictureUrl=data.filePath
-                    this.divData.picUrl=data.tempPath
-                    } else if(this.activeName=='2'){ //广告
-                    this.articleData.articlePicture=data.filePath
-                    this.articleData.articlePic=data.tempPath
-                    } else if(this.activeName=='4'){ //文章管理
-                    this.articleData.articlePicture=data.filePath
-                    this.articleData.articlePic=data.tempPath
-                    }
                 })
                 .catch(e => {});
         },
@@ -555,8 +544,7 @@ export default {
         },
         saveIndex(){
             this.selectData.typeName=""
-            this.selectData.wheelPicture="temp-dir/52bf8e9c.png"
-            console.log(this.selectData)
+            // this.selectData.wheelPicture="temp-dir/52bf8e9c.png"
             if(!this.selectData.wheelPicture || !this.selectData.wheelName || !this.selectData.wheelRank || !this.selectData.jumpUrl || !this.selectData.urlType){
                 this.$message.error('请将上述信息填写完整哦~');
                 return;

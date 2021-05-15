@@ -2,9 +2,10 @@
 #shop{
     background: #F2F4F8;
     border: 1px solid #E2E5EB;
+    height: 100%;
 }
 #shop .container{
-            min-height: 80vh;
+            min-height: calc(100% - 127px);
             background: #fff;
             border: 1px solid #E2E5EB;
             padding: 20px;
@@ -115,7 +116,7 @@
 #shop >>> .el-input-number{line-height:30px}
 #shop >>> .el-select,#shop >>> .el-select .el-input{width:100%}
 </style>
-<style scoped lang="scss">
+<style lang="scss">
 .userTableStyle{color: #333}
 .userTableStyle th>.cell{font-weight: 400}
 .userTableStyle{color: #333;height: 75px;padding: 0!important}
@@ -145,11 +146,11 @@
 #shop .el-input__suffix{line-height: 32px;cursor:pointer;right: 10px;padding-left: 10px;
 // border-left: 1px solid #DCDFE6;
 }
-.shopdialog{height: 600px;}
-.shopdialog .el-dialog__body{height: 520px;overflow-y: auto;}
-.shopdialog1 .el-dialog__header{padding: 0;}
-.shopdialog1 .el-dialog__headerbtn .el-dialog__close{display: none;}
-.shopdialog1 .content{margin-bottom:40px;text-align: center;}
+#shop .shopdialog{height: 600px;}
+#shop .shopdialog .el-dialog__body{height: 520px;overflow-y: auto;}
+#shop .shopdialog1 .el-dialog__header{padding: 0;}
+#shop .shopdialog1 .el-dialog__headerbtn .el-dialog__close{display: none;}
+#shop .shopdialog1 .content{margin-bottom:40px;text-align: center;}
 /* input type="number" 去掉箭头 */
 #shop input::-webkit-outer-spin-button,
 #shop input::-webkit-inner-spin-button {
@@ -211,39 +212,13 @@
                              label="商品名称"
                              align="center">
                              </el-table-column>
-            <el-table-column prop="specifications"
-                             label="商品规格"
-                             align="center">
-                             </el-table-column>
             <el-table-column prop="typeName"
                              label="商品分类"
                              align="center">
                              </el-table-column>
-            <el-table-column prop="discountPrice"
-                             label="促销价格（元）"
-                             align="center"></el-table-column>
                              <el-table-column prop="salePrice"
                              label="商品价格（元）"
                              align="center"></el-table-column>
-            <el-table-column prop="showPicture"
-                             label="详情图片"
-                             align="center">
-                <template slot-scope="scope">
-                    <img :src="scope.row.showPicture"
-                         width="40"
-                         height="40"
-                         class="portrait" />
-                </template>
-            </el-table-column>
-            <el-table-column prop="longPicture"
-                             label="详情介绍"
-                             align="center">
-                <template slot-scope="scope">
-                    <img :src="scope.row.longPicture"
-                         width="40"
-                         height="40"
-                         class="portrait" />
-                </template>
             </el-table-column>
             <el-table-column prop="inOnline"
                              label="是否上架"
@@ -282,17 +257,6 @@
                         @change="changeCommend(scope.row)"
                         >
                     </el-switch>
-                </template>
-            </el-table-column>
-            <el-table-column prop="soldNumber"
-                             label="销量"
-                             style="width: 18%"
-                             align="center"></el-table-column>
-            <el-table-column label="总库存价值"
-                             min-width="100px"
-                             align="center">
-                <template slot-scope="scope">
-                    ¥{{scope.row.totalPurchasePrice || '0.00'}}
                 </template>
             </el-table-column>
             <el-table-column 
@@ -343,15 +307,9 @@
                 </div>
             </div>
             <div class="line flex-center-Y">
-                <div class="label">商品规格</div>
-                <div class="input">
-                    <el-input placeholder="请输入商品规格" v-model="form.specifications"></el-input>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
                 <div class="label">商品描述</div>
                 <div class="input">
-                    <el-input type="textarea" placeholder="请输入商品描述" v-model="form.detail"></el-input>
+                    <el-input type="textarea" placeholder="请输入商品描述" v-model="form.subtitleName"></el-input>
                 </div>
             </div>
             <div class="line flex-center-Y">
@@ -408,50 +366,10 @@
                 </div>
             </div>
             <div class="line flex-center-Y">
-                <div class="label">促销价格（元）</div>
-                <div class="input">
-                    <el-input placeholder="请输入促销价格" v-model="form.discountedPrice" type="number"></el-input>
-                </div>
-            </div>
-            <!-- <div class="line flex-center-Y">
-                <div class="label">折扣率</div>
-                <div class="input">
-                    <el-input placeholder="请输入折扣率" v-model="form.discountRate" type="number" @mousewheel.native.prevent></el-input>
-                </div>
-                &nbsp;%
-            </div> -->
-            <!-- <div class="line flex-center-Y">
-                <div class="label">促销价格（元）</div>
-                <div class="input">
-                    {{Number(form.salePrice)*Number(form.discountRate)/100?(Number(form.salePrice)*Number(form.discountRate)/100).toFixed(2) : form.salePrice}}
-                </div>
-            </div> -->
-            <div class="line flex-center-Y">
-                <div class="label">详情图片</div>
-                <div class="flex-center-Y" style="flex-wrap:wrap;width:400px">
-                    <div class="img" v-for="(item,i) in skuShowPictureList" :key="i" >
-                        <div class="trangle" @click="skuShowPictureList.splice(i,1)"></div>
-                        <img :src="item.filePath" alt="">
-                    </div>
-                    <div>
-                        <el-upload
-                            class="avatar-uploader"
-                            action=""
-                            :http-request="upload2"
-                            :show-file-list="false"
-                            :before-upload="beforeAvatarUpload">
-                            <div>
-                                <img src="../../assets/icons/upload.png" alt="">
-                            </div>
-                        </el-upload>
-                    </div>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
                 <div class="label">详情介绍</div>
                 <div class="flex-center-Y" style="flex-wrap:wrap;width:400px">
-                    <div class="img" v-for="(item,i) in skuLongPictureList" :key="i" >
-                        <div class="trangle" @click="skuLongPictureList.splice(i,1)"></div>
+                    <div class="img" v-for="(item,i) in musicPictureList" :key="i" >
+                        <div class="trangle" @click="musicPictureList.splice(i,1)"></div>
                         <img :src="item.filePath" alt="">
                     </div>
                     <div>
@@ -501,15 +419,9 @@
                 </div>
             </div>
             <div class="line flex-center-Y">
-                <div class="label">商品规格</div>
-                <div class="input">
-                    <el-input placeholder="请输入商品规格" v-model="form.specifications"></el-input>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
                 <div class="label">商品描述</div>
                 <div class="input">
-                    <el-input type="textarea" placeholder="请输入商品描述" v-model="form.detail"></el-input>
+                    <el-input type="textarea" placeholder="请输入商品描述" v-model="form.subtitleName"></el-input>
                 </div>
             </div>
             <div class="line flex-center-Y">
@@ -566,50 +478,10 @@
                 </div>
             </div>
             <div class="line flex-center-Y">
-                <div class="label">促销价格（元）</div>
-                <div class="input">
-                    <el-input placeholder="请输入促销价格" v-model="form.discountedPrice" type="number"></el-input>
-                </div>
-            </div>
-            <!-- <div class="line flex-center-Y">
-                <div class="label">折扣率</div>
-                <div class="input">
-                    <el-input placeholder="请输入折扣率" v-model="form.discountRate" type="number" @mousewheel.native.prevent></el-input>
-                </div>
-                &nbsp;%
-            </div> -->
-            <!-- <div class="line flex-center-Y">
-                <div class="label">促销价格（元）</div>
-                <div class="input">
-                    {{Number(form.salePrice)*Number(form.discountRate)/100?(Number(form.salePrice)*Number(form.discountRate)/100).toFixed(2) : form.salePrice}}
-                </div>
-            </div> -->
-            <div class="line flex-center-Y">
-                <div class="label">详情图片</div>
-                <div class="flex-center-Y" style="flex-wrap:wrap;width:400px">
-                    <div class="img" v-for="(item,i) in skuShowPictureList" :key="i" >
-                        <div class="trangle" @click="skuShowPictureList.splice(i,1)"></div>
-                        <img :src="item.filePath" alt="">
-                    </div>
-                    <div>
-                        <el-upload
-                            class="avatar-uploader"
-                            action=""
-                            :http-request="upload2"
-                            :show-file-list="false"
-                            :before-upload="beforeAvatarUpload">
-                            <div>
-                                <img src="../../assets/icons/upload.png" alt="">
-                            </div>
-                        </el-upload>
-                    </div>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
                 <div class="label">详情介绍</div>
                 <div class="flex-center-Y" style="flex-wrap:wrap;width:400px">
-                    <div class="img" v-for="(item,i) in skuLongPictureList" :key="i" >
-                        <div class="trangle" @click="skuLongPictureList.splice(i,1)"></div>
+                    <div class="img" v-for="(item,i) in musicPictureList" :key="i" >
+                        <div class="trangle" @click="musicPictureList.splice(i,1)"></div>
                         <img :src="item.filePath" alt="">
                     </div>
                     <div>
@@ -641,135 +513,6 @@
                 <div class="btn1" @click="removeVisible = false">取消</div>
                 <div class="btn" @click="commitRemove()">确认</div>
             </div>
-        </el-dialog>
-        <el-dialog title="设置预警"
-                   :visible.sync="setAlertDialogVisible"
-                   width="40%">
-            <el-row class="msg">
-                <el-col :span="12">
-                    <div class="name">SKU分类</div>
-                    <div class="item-set"
-                         v-for="(item,i) in typeFilters"
-                         :key="i">{{item.text}}</div>
-                </el-col>
-                <el-col :span="12">
-                    <el-tooltip class="item"
-                                effect="light"
-                                content="自采购单生成至仓库入库完成的时间，如超出设置的周期，可能导致采购单生成计划错误"
-                                placement="top">
-                        <div class="title-hover name">
-                            采购周期
-                            <i class="el-icon-warning orange"></i>
-                        </div>
-                    </el-tooltip>
-                    <div class="item-set"
-                         v-for="(item,i) in typeFilters"
-                         :key="i">
-                        <el-select v-model="item.goodsPeriod"
-                                   placeholder="请选择"
-                                   slot="prepend"
-                                   size="small">
-                            <el-option v-for="item in selectTabsA"
-                                       :key="item.id"
-                                       :label="item.name"
-                                       :value="item.id">
-                            </el-option>
-                        </el-select>
-                    </div>
-                </el-col>
-            </el-row>
-            <div class="note">库存预警公式：SKU近30天出库数量/30*采购周期</div>
-            <div class="note">注：该设置将关联采购单的自动生成</div>
-            <span slot="footer"
-                  class="dialog-footer">
-                <el-button @click="setAlertDialogVisible = false">取 消</el-button>
-                <el-button type="primary"
-                           @click="confirmAlert">确 定</el-button>
-            </span>
-        </el-dialog>
-        <el-dialog title="添加库存"
-                   :visible.sync="addStockVisible"
-                   >
-            <el-form v-model="skuInfoForm" label-width="120px">
-                <el-row>
-                    <el-col :span="7">
-                        <el-form-item label="SKU名称: ">
-                            <span>{{skuInfoForm.skuName}}&nbsp;</span> 
-                            <img :src="skuInfoForm.appPicture"
-                                width="40"
-                                height="40"
-                                class="portrait" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="10">
-                        <el-select v-model="productionStatus" placeholder="请选择" @change="changequality">
-                            <el-option label="按生产日期" value="0"></el-option>
-                            <el-option label="按过保日期" value="1"></el-option>
-                            <el-option label="无保质期" value="2"></el-option>
-                        </el-select>
-                        <el-select v-model="quality" placeholder="选择保质期"  v-if="productionStatus=='0'">
-                            <el-option
-                            v-for="item in qualityoptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                            </el-option>
-                        </el-select>
-                    </el-col>
-                </el-row>
-                <el-row v-for="(item,key) in addData" :key="key">
-                    <el-col :span="10">
-                        <el-form-item label="生产日期:" v-if="productionStatus=='0'">
-                            <el-date-picker
-                                v-model="item.createdTimes"
-                                type="date"
-                                value-format="yyyy-MM-dd"
-                                format="yyyy-MM-dd"
-                                placeholder="选择日期 "
-                                :picker-options="pickerOptions0">
-                            </el-date-picker>
-                        </el-form-item>   
-                        <!-- <el-form-item label="保质期:" v-if="productionStatus=='0'">
-                            <el-select v-model="quality" placeholder="请选择">
-                                <el-option
-                                v-for="item in qualityoptions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>  -->
-                        <el-form-item label="过保日期:" v-if="productionStatus=='1'">
-                            <el-date-picker
-                                v-model="item.exceedTimes"
-                                type="date"
-                                value-format="yyyy-MM-dd"
-                                format="yyyy-MM-dd"
-                                placeholder="选择日期 "
-                                :picker-options="pickerOptions01">
-                            </el-date-picker>
-                        </el-form-item>   
-                    </el-col>
-                    <el-col :span="13" class="addstock">
-                        <el-form-item label="增加库存:">
-                            <el-input v-model="item.wareNums" placeholder="请输入基础库存"></el-input> 
-                            <span> 件</span>
-                            <span class="" style="color:#f56c6c" @click="delLine(key)">&nbsp;&nbsp;<i class="el-icon-remove"></i></span>
-                            <span class="blue" @click="addLine" v-if="key==addData.length-1">&nbsp;&nbsp;<i class="el-icon-circle-plus"></i></span>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <div style="text-align:center"> 
-                    <span class="blue" @click="addLine" v-if="addData.length==0">&nbsp;&nbsp;<i class="el-icon-circle-plus"></i></span>
-                </div>
-                
-            </el-form>
-            <span slot="footer"
-                  class="dialog-footer">
-                <el-button @click="addStockVisible = false">取 消</el-button>
-                <el-button type="primary"
-                           @click="confirmAddStock">确 定</el-button>
-            </span>
         </el-dialog>
         <el-dialog :title="title"
                    :visible.sync="typeDialogVisible"
@@ -930,8 +673,7 @@ export default {
             typeDialogVisible:false,
             editVisible:false,
             removeVisible:false,
-            skuShowPictureList:[],
-            skuLongPictureList:[],
+            musicPictureList:[],
             imageUrl1:"",
             typeList:[],
             typeList1:[],
@@ -1075,7 +817,7 @@ export default {
             var formData = new FormData();
             formData.append("file", content.file);
             this.api({
-                url: "/uploadfile/upload",
+                url: "/uploadfile/uploadPic",
                 method: "post",
                 data: formData
             })
@@ -1085,28 +827,11 @@ export default {
                 })
                 .catch(e => {});
         },
-        upload2(content) {//商品图片
-            var formData = new FormData();
-            formData.append("file", content.file);
-            this.api({
-                url: "/uploadfile/upload",
-                method: "post",
-                data: formData
-            })
-                .then(data => {
-                    let img={
-                        filePath:data.filePath,
-                        tempPath:data.tempPath
-                    }
-                    this.skuShowPictureList.push(img)
-                })
-                .catch(e => {});
-        },
         upload3(content) {//商品图片
             var formData = new FormData();
             formData.append("file", content.file);
             this.api({
-                url: "/uploadfile/upload",
+                url: "/uploadfile/uploadPic",
                 method: "post",
                 data: formData
             })
@@ -1115,7 +840,7 @@ export default {
                         filePath:data.filePath,
                         tempPath:data.tempPath
                     }
-                    this.skuLongPictureList.push(img)
+                    this.musicPictureList.push(img)
                 })
                 .catch(e => {});
         },
@@ -1184,13 +909,9 @@ export default {
                     .catch(e => {});
         },
         commitForm(){//添加商品
-            var skuShowPictureList=[]
-            var skuLongPictureList=[]
-            for(let i in this.skuShowPictureList){
-                skuShowPictureList.push(this.skuShowPictureList[i].tempPath)
-            }
-            for(let i in this.skuLongPictureList){
-                skuLongPictureList.push(this.skuLongPictureList[i].tempPath)
+            var musicPictureList=[]
+            for(let i in this.musicPictureList){
+                musicPictureList.push(this.musicPictureList[i].tempPath)
             }
             if(!this.form.skuName){
                     this.$message({
@@ -1199,14 +920,7 @@ export default {
                     });
                     return;
                 }
-            if(!this.form.specifications){
-                    this.$message({
-                        type: "warning",
-                        message: "请输入商品规格"
-                    });
-                    return;
-                }
-            if(!this.form.detail){
+            if(!this.form.subtitleName){
                     this.$message({
                         type: "warning",
                         message: "请输入商品描述"
@@ -1227,20 +941,6 @@ export default {
                     });
                     return;
                 }
-            if(!this.form.discountedPrice){
-                this.$message({
-                    type: "warning",
-                    message: "请输入商品促销价格"
-                });
-                return;
-            }
-            // if(!this.form.discountRate || Number(this.form.discountRate)>100 || this.form.discountRate<0){
-            //         this.$message({
-            //             type: "warning",
-            //             message: "请输入0-100的折扣率"
-            //         });
-            //         return;
-            //     }
             if(!this.form.skuPicture){
                     this.$message({
                         type: "warning",
@@ -1248,14 +948,7 @@ export default {
                     });
                     return;
                 }
-            if(this.skuShowPictureList.length==0){
-                    this.$message({
-                        type: "warning",
-                        message: "请上传详情图片"
-                    });
-                    return;
-                }
-            if(this.skuShowPictureList.length==0){
+            if(this.musicPictureList.length==0){
                     this.$message({
                         type: "warning",
                         message: "请上传详情介绍图片"
@@ -1270,14 +963,13 @@ export default {
                     salePrice:this.form.salePrice,
                     discountedPrice:this.form.discountedPrice,
                     skuPicture:this.form.skuPicture,
-                    skuShowPictureList:skuShowPictureList,
-                    skuLongPictureList:skuLongPictureList,
+                    musicPictureList:musicPictureList,
                     typeId:this.form.typeId,
                     goodsLabel1:this.form.goodsLabel1,
                     goodsLabel2:this.form.goodsLabel2,
                     goodsLabel3:this.form.goodsLabel3,
                     contryName:this.form.contryName,
-                    detail:this.form.detail,
+                    subtitleName:this.form.subtitleName,
                     specifications:this.form.specifications,
                     orderNum:this.form.orderNum
                 }
@@ -1296,13 +988,12 @@ export default {
                             goodsLabel1:"",
                             goodsLabel2:"",
                             goodsLabel3:"",
-                            detail:"",
+                            subtitleName:"",
                             contryName:"",
                             specifications:"",
                             orderNum:""
                             }
-                this.skuShowPictureList=[]
-                this.skuLongPictureList=[]
+                this.musicPictureList=[]
                 this.createVisible=false
                 this.getTypeList()
             }).catch(data =>{
@@ -1321,16 +1012,11 @@ export default {
             }).then(data => {
                 this.form=data
                 this.imageUrl1=this.form.skuPicture
-                var skuShowPictureList=[]
-                for(let i in this.form.skuShowPictureList){
-                    skuShowPictureList.push({filePath:this.form.skuShowPictureList[i]})
+                var musicPictureList=[]
+                for(let i in this.form.musicPictureList){
+                    musicPictureList.push({filePath:this.form.musicPictureList[i]})
                 }
-                this.skuShowPictureList=skuShowPictureList
-                var skuLongPictureList=[]
-                for(let i in this.form.skuLongPictureList){
-                    skuLongPictureList.push({filePath:this.form.skuLongPictureList[i]})
-                }
-                this.skuLongPictureList=skuLongPictureList
+                this.musicPictureList=musicPictureList
             });
         },
         clear(){
@@ -1344,28 +1030,19 @@ export default {
                         goodsLabel1:"",
                         goodsLabel2:"",
                         goodsLabel3:"",
-                        detail:"",
+                        subtitleName:"",
                         contryName:"",
                         orderNum:""
                         }
-            this.skuShowPictureList=[]
-            this.skuLongPictureList=[]
+            this.musicPictureList=[]
         },
         commitEdit(){//编辑商品
-            var skuShowPictureList=[]
-            var skuLongPictureList=[]
-            for(let i in this.skuShowPictureList){
-                if(this.skuShowPictureList[i].tempPath){
-                    skuShowPictureList.push(this.skuShowPictureList[i].tempPath)
+            var musicPictureList=[]
+            for(let i in this.musicPictureList){
+                if(this.musicPictureList[i].tempPath){
+                    musicPictureList.push(this.musicPictureList[i].tempPath)
                 }else{
-                    skuShowPictureList.push(this.skuShowPictureList[i].filePath)
-                }
-            }
-            for(let i in this.skuLongPictureList){
-                if(this.skuLongPictureList[i].tempPath){
-                    skuLongPictureList.push(this.skuLongPictureList[i].tempPath)
-                }else{
-                    skuLongPictureList.push(this.skuLongPictureList[i].filePath)
+                    musicPictureList.push(this.musicPictureList[i].filePath)
                 }
             }
             if(!this.form.skuName){
@@ -1375,14 +1052,7 @@ export default {
                     });
                     return;
                 }
-            if(!this.form.specifications){
-                    this.$message({
-                        type: "warning",
-                        message: "请输入商品规格"
-                    });
-                    return;
-                }
-            if(!this.form.detail){
+            if(!this.form.subtitleName){
                     this.$message({
                         type: "warning",
                         message: "请输入商品描述"
@@ -1403,21 +1073,6 @@ export default {
                     });
                     return;
                 }
-            
-            if(!this.form.discountedPrice){
-                this.$message({
-                    type: "warning",
-                    message: "请输入商品促销价格"
-                });
-                return;
-            }
-            // if(!this.form.discountRate || Number(this.form.discountRate)>100 || this.form.discountRate<0){
-            //         this.$message({
-            //             type: "warning",
-            //             message: "请输入0-100的折扣率"
-            //         });
-            //         return;
-            //     }
             if(!this.form.skuPicture){
                     this.$message({
                         type: "warning",
@@ -1425,14 +1080,7 @@ export default {
                     });
                     return;
                 }
-            if(this.skuShowPictureList.length==0){
-                    this.$message({
-                        type: "warning",
-                        message: "请上传详情图片"
-                    });
-                    return;
-                }
-            if(this.skuShowPictureList.length==0){
+            if(this.musicPictureList.length==0){
                     this.$message({
                         type: "warning",
                         message: "请上传详情介绍图片"
@@ -1449,14 +1097,13 @@ export default {
                     salePrice:this.form.salePrice,
                     discountedPrice:this.form.discountedPrice,
                     skuPicture:this.form.skuPicture,
-                    skuShowPictureList:skuShowPictureList,
-                    skuLongPictureList:skuLongPictureList,
+                    musicPictureList:musicPictureList,
                     typeId:this.form.typeId,
                     goodsLabel1:this.form.goodsLabel1,
                     goodsLabel2:this.form.goodsLabel2,
                     goodsLabel3:this.form.goodsLabel3,
                     contryName:this.form.contryName,
-                    detail:this.form.detail,
+                    subtitleName:this.form.subtitleName,
                     specifications:this.form.specifications,
                     orderNum:this.form.orderNum
 
@@ -1476,200 +1123,19 @@ export default {
                             goodsLabel1:"",
                             goodsLabel2:"",
                             goodsLabel3:"",
-                            detail:"",
+                            subtitleName:"",
                             contryName:"",
                             specifications:"",
                             orderNum:""
                             }
-                this.skuShowPictureList=[]
-                this.skuLongPictureList=[]
+                this.musicPictureList=[]
                 this.editVisible=false
                 this.getTypeList()
             }).catch(data =>{
                  
             });
         },
-        commitAdd(row){//提交添加库存
-                let  gmtProduction,productionDate,outWarrantyTime,batchId
-                if(!row.productionStatus){
-                    this.$message({
-                        type: "error",
-                        message: "请选择保质期类型"
-                    });
-                    return;
-                }
-                if(row.productionStatus=='0'){
-                    gmtProduction=row.gmtProduction
-                    productionDate=row.productionDate
-                    if(!gmtProduction || !productionDate){
-                        this.$message({
-                        type: "error",
-                        message: "请填写生产日期及保质期"
-                    });
-                    return;
-                    }
-                }else if(row.productionStatus=='1'){
-                    outWarrantyTime=row.outWarrantyTime
-                    if(!outWarrantyTime){
-                        this.$message({
-                        type: "error",
-                        message: "请填写过保日期"
-                    });
-                    return;
-                    }
-                }else if(row.productionStatus=='2'){
-                    
-                }
-                if(!row.purchasePrice){
-                    this.$message({
-                        type: "error",
-                        message: "请填写成本"
-                    });
-                    return;
-                }
-                if(!row.residueNum){
-                    this.$message({
-                        type: "error",
-                        message: "请填写数量"
-                    });
-                    return;
-                }
-            this.api({
-                url: "/shopping/sku/addStock",
-                method: "post",
-                data: {outWarrantyTime:outWarrantyTime,purchasePrice:row.purchasePrice,productionStatus:row.productionStatus,createdTimes:gmtProduction,wareNums:row.residueNum,skuCode:this.skuCode,wareId:this.selectWare,productionDate:productionDate}
-            }).then(data => {
-                this.$message({
-                        type: "success",
-                        message: "添加成功 !"
-                    });
-                this.getList()
-                this.getBatch()
-                
-                this.batchList[0].showCommit=false
-            }).catch(data =>{
-                 
-            });
-        },
-        delbatch(row){
-            this.api({
-                        url: "/shopping/sku/delBatchInfo",
-                        method: "post",
-                        data: {
-                            batchId:row.batchId,
-                            residueNum:row.residueNum,
-                            skuCode:row.skuCode
-                        }
-                    })
-                        .then(data => {
-                            this.$message({
-                                type: "success",
-                                message: "删除成功 !"
-                            });
-                            this.getList()
-                            this.getBatch()
-                        })
-        },
-        expandChange(row, expandedRows) {
-            this.selectRow=row
-            if(expandedRows.length==0){//如果都关闭时要把父行上的 + 号去掉
-                row.showadd=false
-                this.tableData=JSON.parse(JSON.stringify(this.tableData))
-            }
-            //每次只能展开一行
-            var that = this
-            if (expandedRows.length) {
-              that.expands = []
-              if (row) {
-                that.expands.push(row.skuCode)
-              }
-            } else {
-              that.expands = []
-            }
-            //每次只能展开一行
-            this.skuCode=row.skuCode
-            for(let i in this.tableData){
-                this.tableData[i].showadd=false
-            }
-            row.showadd=true
-            this.getBatch()
-        },
-        clickTable(row,index,e){//点击行就展开
-            //调用,table的方法,展开/折叠 行
-            this.$refs.refTable.toggleRowExpansion(row)
-        },
-        getBatch(){
-            this.api({
-                        url: "/shopping/sku/batchInfo",
-                        method: "post",
-                        data: {
-                            skuCode: this.skuCode,
-                        }
-                    })
-                        .then(data => {
-                           this.batchList=data.list
-                           for(let i in this.batchList){
-                               this.batchList[i].showEdit=false
-                               if(this.batchList[i].gmtProduction){
-                                   this.batchList[i].productionStatus='0'
-                               }else if(this.batchList[i].outWarrantyTime){
-                                   this.batchList[i].productionStatus='1'
-                               }else{
-                                   this.batchList[i].productionStatus='2'
-                               }
-                           }
-                        })
-        },
-        toPurchase(row){
-            this.$confirm('是否生成采购单去采购', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-                }).then(() => {
-                    this.api({
-                        url: "/shopping/inventory/oneClickProcurement",
-                        method: "post",
-                        data: {
-                            wareId : this.selectWare,
-                            skuCode: row.skuCode,
-                            purchaseLimit:row.purchaseLimit,
-                            manageId: this.userId
-                        }
-                    })
-                        .then(data => {
-                            this.$message({
-                                type: "success",
-                                message: "操作成功!"
-                            });
-                            this.getList()
-                        })
-                }).catch(() => {
-                      
-                });
-            
-        },
-        changequality(){
-            this.quality=""
-        },
-        // getWare(){
-        //      this.api({
-        //         url: "/inventory/wareInfoList",
-        //         method: "post",
-        //         data: {
-        //         }
-        //     }).then(data => {
-        //         this.wareoptions=data
-        //         this.selectWare=data[0].wareId
-        //         this.params.wareId=this.selectWare
-        //         this.getList(this.params);
-               
-        //     });
-        // },
-        // selectWaree(){
-        //     console.log(11111)
-        //     this.params.wareId=this.selectWare
-        //     this.getList(this.params);
-        // },
+        
         handleSizeChange(val) {
             this.params.pageRow = val;
             this.getList(this.params);
@@ -1685,36 +1151,6 @@ export default {
         nextClick(index) {
             this.params.pageNum = index;
             this.getList(this.params);
-        },
-        confirmAlert() {
-            let array = "";
-            for (let i in this.typeFilters) {
-                if (!this.typeFilters[i].goodsPeriod) {
-                    this.$message({
-                        type: "warning",
-                        message: "您有未填写的采购周期"
-                    });
-                    return;
-                }
-                let item = {
-                    goodsType: this.typeFilters[i].value,
-                    goodsPeriod: this.typeFilters[i].goodsPeriod
-                };
-                array += JSON.stringify(item);
-            }
-            this.api({
-                url: "/shopping/ware/setWarn",
-                method: "get",
-                params: {
-                    lists: array
-                }
-            }).then(data => {
-                this.$message({
-                    type: "success",
-                    message: "设置成功"
-                });
-                this.setAlertDialogVisible = false;
-            });
         },
         show() {
             this.setAlertDialogVisible = true;
@@ -1758,109 +1194,13 @@ export default {
         getList() {
             this.listLoading = true;
             this.api({
-                url: "/shopping/sku/find",
+                url: "/musicList",
                 method: "post",
                 data: this.params
             }).then(data => {
                 this.listLoading = false;
                 this.tableData = data.list;
                 this.totalCount = data.count;
-                for(let i in this.tableData){
-                    this.tableData[i].showPicture=this.tableData[i].skuShowPictureList[0] || ''
-                    this.tableData[i].longPicture=this.tableData[i].skuLongPictureList[0] || ''
-                }
-                if(this.selectRow.skuCode){//进行过该行的操作之后,操作的行会赋给selectRow,再刷新tableData时要展示 + 号
-                    for(let i in this.tableData){
-                        if(this.tableData[i].skuCode==this.selectRow.skuCode){
-                            this.tableData[i].showadd=true
-                        }
-                    }
-                }
-            });
-        },
-        stockAdd(row){
-            // this.addStockVisible=true
-            // this.productionStatus=row.productionStatus
-            // this.skuInfoForm.appPicture=row.appPicture
-            // this.skuInfoForm.skuName=row.skuName
-            // this.skuInfoForm.skuCode=row.skuCode  
-            // if(row.productionDate>0){
-            //     this.quality=row.productionDate
-            // } 
-           this.showshow=false
-            let batch={
-                batchId:"",
-                residueNum:1,
-                allPurchasePrice:"",
-                outWarrantyTime:"",
-                showCommit:true,
-                purchasePrice:0,
-                showEdit:true,
-            }
-            this.batchList.unshift(batch)
-        },
-        addLine(){
-            var add={}
-            this.addData.push(add)
-        },
-        delLine(index){
-            this.addData.splice(index,1)
-        },
-        confirmAddStock(){//保存手动添加的库存
-            let createdTimes=""
-            let wareNums=""
-            for(let i in this.addData){
-                if(this.productionStatus=='0'){
-                    if(i==0){
-                        createdTimes+=this.addData[i].createdTimes
-                        wareNums+=this.addData[i].wareNums
-                    }else{
-                        createdTimes+=','+this.addData[i].createdTimes
-                        wareNums+=','+this.addData[i].wareNums
-                    }
-                }else if(this.productionStatus=='1'){
-                    if(i==0){
-                        createdTimes+=this.addData[i].exceedTimes
-                        wareNums+=this.addData[i].wareNums
-                    }else{
-                        createdTimes+=','+this.addData[i].exceedTimes
-                        wareNums+=','+this.addData[i].wareNums
-                    }
-                }else if(this.productionStatus=='2'){
-                    if(i==0){
-                        wareNums+=this.addData[i].wareNums
-                    }else{
-                        wareNums+=','+this.addData[i].wareNums
-                    }
-                }
-                
-                
-            }
-            this.api({
-                url: "/shopping/sku/addStock",
-                method: "post",
-                data: {productionStatus:this.productionStatus,createdTimes:createdTimes,wareNums:wareNums,skuCode:this.skuCode,wareId:this.selectWare,productionDate:this.quality || 0}
-            }).then(data => {
-                this.$message({
-                        type: "success",
-                        message: "添加成功 !"
-                    });
-                this.addData=[{createdTimes:"",wareNums:""}]
-                this.addStockVisible=false
-                this.getList()
-            }).catch(data =>{
-                if(this.addData.length==0){
-                    this.$message({
-                        type: "error",
-                        message: "请先添加一条库存哦 !"
-                    });
-                }else{
-                    this.$message({
-                        type: "error",
-                        message: "请将库存信息填写完整 !"
-                    });
-                }
-                 
             });
         },
         showType(scope) {//添加或编辑分类
@@ -1893,7 +1233,7 @@ export default {
                 return;
             }
             this.api({
-                url: "/shopping/insertType",
+                url: "/addType",
                 method: "post",
                 data: {
                     typeName: this.typeName
@@ -1930,7 +1270,7 @@ export default {
                 return;
             }
             this.api({
-                url: "/shopping/updateType",
+                url: "/updateType",
                 method: "post",
                 data: {
                     typeId: this.typeId,
@@ -1953,7 +1293,7 @@ export default {
                 type: "warning"
             }).then(() => {
                 this.api({
-                    url: "/shopping/deleteType",
+                    url: "/deleteType",
                     method: "post",
                     data: {
                         typeId: row.typeId
@@ -1971,13 +1311,11 @@ export default {
         },
         getTypeList(){
             this.api({
-                url: "/shopping/selectType",
-                method: "get"
+                url: "/typeList",
+                method: "post",
+                data:{}
             }).then(data => {
-                this.typeList=data
-                this.typeList.forEach(item => {
-                    item.typeId=item.id
-                })
+                this.typeList=data.list
                 this.typeList1=JSON.parse(JSON.stringify(this.typeList)) 
                 this.typeList.unshift({typeName:"全部",typeId:""})
                 if(!this.params.typeId){

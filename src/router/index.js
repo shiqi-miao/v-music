@@ -32,9 +32,9 @@ export const constantRouterMap = [
     children: [
       {
         path: '',
-        name: '广告管理',
+        name: '轮播图管理',
         component: _import('kupper/index'),
-        meta: { title: '广告管理', icon: '' },
+        meta: { title: '轮播图管理', icon: '' },
         menu: '',
       }
     ],

@@ -131,8 +131,8 @@ $red: #ff1b11;
 }
 .scroll-wrapper .el-menu-item{
   font-size: 0.9vw!important;
-  height: 4.5vh;
-  line-height: 4.5vh;
+  height: 45px;
+  line-height: 45px;
 } 
 .scroll-wrapper .el-menu--horizontal .el-menu .el-menu-item{height: 44px;}
 .scroll-wrapper .submenu-title-noDropdown{

@@ -6,8 +6,6 @@
 
 <template>
     <div class="app-container">
-        <!-- <el-button type="success" icon="el-icon-plus" @click="addGoods">新增</el-button> -->
-        <!-- <div><span>尚有机器未配置补货员! <span style="color:#999" @click="toRepair">去配置</span> </span></div> -->
     </div>
    
 </template>
@@ -38,11 +36,6 @@ export default {
                     return;
                 }
                 //登陆成功后,页面跳转到有权限的模块的第一个模块
-        },
-
-        onClick() {
-            this.exprieNotify.close();
-            this.$router.push({ name: "促销管理", params: { tab: "expired" } });
         }
     },
     computed: {

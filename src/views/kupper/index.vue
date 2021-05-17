@@ -344,64 +344,15 @@ export default {
         },
         getList() {
             this.listLoading = true;
-            if(this.activeName=='0'){
-                this.api({
-                    url: "/showPlantingList",
-                    method: "post",
-                    data: this.params
-                }).then(data => {
-                    this.listLoading = false;
-                    this.tableData=data.list
-                    this.totalCount = data.totalCount;
-                });
-            }else if(this.activeName=='1'){//区块导航
-                this.api({
-                    url: "/shopping/findRegion",
-                    method: "post",
-                    data: this.params
-                }).then(data => {
-                    this.listLoading = false;
-                    this.tableData=data.list
-                    this.totalCount = data.totalCount;
-                });
-            }else if(this.activeName=='2'){//广告模块
-                this.api({
-                    url: "/kupper/plant/showPlantingList",
-                    method: "post",
-                    data: this.params
-                }).then(data => {
-                    this.listLoading = false;
-                    this.tableData=data.list
-                    this.totalCount = data.totalCount;
-                });
-            }else if(this.activeName=='3'){//标签管理
-                this.api({
-                    url: "/kupper/article/showAllArticleLabel",
-                    method: "post",
-                    data: this.params
-                }).then(data => {
-                    this.listLoading = false;
-                    this.tableData=data.list
-                    this.totalCount = data.totalCount;
-                });
-            }else if(this.activeName=='4'){//文章管理
-                this.api({
-                    url: "/kupper/article/showAllArticle",
-                    method: "post",
-                    data: this.params
-                }).then(data => {
-                    this.listLoading = false;
-                    this.tableData=data.list
-                    this.totalCount = data.totalCount;
-                });
-                this.api({
-                    url: "/kupper/article/showAllArticleLabel",
-                    method: "post",
-                    data: {pageNum:"1",pageRow:"100"}
-                }).then(data => {
-                    this.labList=data.list
-                });
-            }
+            this.api({
+                url: "/support/api/showPlantingList",
+                method: "post",
+                data: this.params
+            }).then(data => {
+                this.listLoading = false;
+                this.tableData=data.list
+                this.totalCount = data.totalCount;
+            });
                 
         },
         handleSizeChange(val) {
@@ -422,7 +373,7 @@ export default {
         },
         getUrlList(){
             this.api({
-                    url: "/shopping/findInternalUrl",
+                    url: "/support/api/neilianlist",
                     method: "get"
                 }).then(data => {
                     this.linkList=data
@@ -462,13 +413,13 @@ export default {
             this.dialogTitle="修改配置"
             this.indexVisible=true
             this.api({
-                    url: "/updateWheelPlantShow",
+                    url: "/support/api/updateWheelPlantShow",
                     method: "post",
                     data: {
                         plantingId:row.plantingId
                     }
                 }).then(data => {
-                    this.selectData=row
+                    this.selectData=data
                 });
             
             
@@ -513,34 +464,14 @@ export default {
             this.getList()
         },
         upWheelPlant(row){//上下架
-            if(this.activeName=='0'){
             this.selectData=row
             this.api({
-                    url: "/updateWheelPlant",
+                    url: "/support/api/updateWheelPlant",
                     method: "post",
                     data:this.selectData
                 }).then(data => {
                     this.getList()
                 });
-                }else if(this.activeName=='1'){
-                    this.labData=row
-                    this.api({
-                            url: "/kupper/article/updateArticleLabel",
-                            method: "post",
-                            data:this.labData
-                        }).then(data => {
-                            this.getList()
-                        });
-                }else{
-                    this.articleData=row
-                    this.api({
-                            url: "/kupper/article/updateArticle",
-                            method: "post",
-                            data:this.articleData
-                        }).then(data => {
-                            this.getList()
-                        });
-                }
         },
         saveIndex(){
             this.selectData.typeName=""
@@ -558,7 +489,7 @@ export default {
             this.selectData.wheelPicture=this.selectData.wheelPic ? this.selectData.wheelPic : this.selectData.wheelPicture
             if(this.dialogTitle=="添加配置"){
             this.api({
-                    url: "/addWheelPlant",
+                    url: "/support/api/addWheelPlant",
                     method: "post",
                     data:this.selectData
                 }).then(data => {
@@ -573,7 +504,7 @@ export default {
                     this.selectData.linkName=""
                 });}else{
                     this.api({
-                    url: "/updateWheelPlant",
+                    url: "/support/api/updateWheelPlant",
                     method: "post",
                     data:this.selectData
                 }).then(data => {
@@ -704,7 +635,7 @@ export default {
                 type: 'warning'
                 }).then(() => {
                 this.api({
-                    url: "/deleteWheelPlant",
+                    url: "/support/api/deleteWheelPlant",
                     method: "post",
                     data: {plantingId:row.plantingId}
                 }).then(data => {

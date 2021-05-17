@@ -1,18 +1,14 @@
 <template>
   <div class="scroll-container flex-center" ref="scrollContainer" @wheel.prevent="handleScroll" >
-    <div class="center-top-top" v-if="sidebar.opened">
+    <!-- <div class="center-top-top" v-if="sidebar.opened">
                     <div class="flex-center">
                       <div class="inner-box flex-center">
                         <img src="../../assets/analysis/logo.png"
                              alt=""
                              class="logo">
-                        <!-- <img src="../../assets/super/logo.png"
-                             alt=""
-                             class="logo">
-                        <div class="title">光芽新零售</div> -->
                       </div>
                     </div>
-    </div>
+    </div> -->
     <div class="center-top-top" v-if="!sidebar.opened" style="height:3%!important">
                     
     </div>
@@ -86,7 +82,7 @@ $red: #ff1b11;
     position: absolute;
     width: 60%!important;
     min-width: 756px;
-    left: 182px;
+    left: 0px;
   }
 }
 

@@ -100,7 +100,7 @@
 }
 .justify-center{justify-content: center;}
 .searchInput{width: 240px;
-    margin-right: 30px;}
+    margin-right: 20px;}
 .brandtype {
     margin-right: 10px;
     background: #ffffff;
@@ -113,6 +113,7 @@
     color: #409eff;
     border: 1px solid rgba(64, 158, 255, 0.2);
 }
+.select{margin-right: 20px;}
 #shop >>> .el-input-number{line-height:30px}
 #shop >>> .el-select,#shop >>> .el-select .el-input{width:100%}
 </style>
@@ -163,7 +164,7 @@
         <div class="top">
             <div class="flex-center-Y" style="margin-bottom:20px">
                 <div class="searchInput">
-                    <el-input placeholder="请输入商品名称" v-model="searchValue" @input="search">
+                    <el-input placeholder="请输入商品名称" v-model="params.skuName" @input="search">
                         <i
                             class="el-icon-search"
                             slot="suffix"
@@ -171,6 +172,18 @@
                         </i>
                     </el-input>
                 </div>
+                    <div class="select">
+                        <el-select v-model="params.isFree" clearable="" placeholder="商品类型" @change="search">
+                            <el-option
+                            label="付费"
+                            value="Y">
+                            </el-option>
+                            <el-option
+                            label="免费"
+                            value="N">
+                            </el-option>
+                        </el-select>
+                    </div>
                 <div class="btn" @click="createVisible=true">创建商品</div>
             </div>
             <div>
@@ -219,44 +232,15 @@
                              <el-table-column prop="salePrice"
                              label="商品价格（元）"
                              align="center"></el-table-column>
-            </el-table-column>
-            <el-table-column prop="inOnline"
-                             label="是否上架"
-                             align="center">
-                <template slot-scope="scope">
-                    <el-switch
-                        v-model="scope.row.isOnline"
-                        active-color="#13ce66"
-                        inactive-color="#ff4949"
-                        active-value="Y"
-                        inactive-value="N"
-                        @change="changePut(scope.row)"
-                        >
-                    </el-switch>
-                </template>
-            </el-table-column>
-            <el-table-column prop="appPicture"
+            <el-table-column prop="orderNum"
                              label="上架排序"
                              align="center">
-                <template slot-scope="scope">
-                    <span v-if="!scope.row.isEdit">{{scope.row.orderNum}}</span>
-                    <el-input v-else v-model="scope.row.orderNum" :ref="'input'+scope.$index" @blur="changeOrderNum(scope.row)"></el-input>
-                    <i  v-if="!scope.row.isEdit" class="el-icon-edit-outline" @click.stop="editOrder(scope.row,scope.$index)"></i>
-                </template>
             </el-table-column>
             <el-table-column prop="isRecommend"
-                             label="是否推荐"
+                             label="是否免费"
                              align="center">
                 <template slot-scope="scope">
-                    <el-switch
-                        v-model="scope.row.isRecommend"
-                        active-color="#13ce66"
-                        inactive-color="#ff4949"
-                        active-value="Y"
-                        inactive-value="N"
-                        @change="changeCommend(scope.row)"
-                        >
-                    </el-switch>
+                    <span>{{scope.row.isFree=='Y'?'是':'否'}}</span>
                 </template>
             </el-table-column>
             <el-table-column 
@@ -265,8 +249,7 @@
                     align="center"
                     >
                 <template slot-scope="scope">
-                    <span class="blue" @click.stop="edit(scope.row)">编辑</span> 
-                    <span class="blue" v-if="scope.row.showadd" @click.stop="stockAdd(scope.row)">添加库存</span>
+                    <span class="blue" @click.stop="edit(scope.row)">编辑</span>
                     <span class="blue" @click.stop="removeVisible=true;selectData=scope.row">删除</span>
                 </template>
                 
@@ -301,114 +284,17 @@
                 </div>
             </div>
             <div class="line flex-center-Y">
-                <div class="label">商品名称</div>
-                <div class="input">
-                    <el-input placeholder="请输入商品名称" v-model="form.skuName"></el-input>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
-                <div class="label">商品描述</div>
-                <div class="input">
-                    <el-input type="textarea" placeholder="请输入商品描述" v-model="form.subtitleName"></el-input>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
-                <div class="label">所属分类</div>
-                <div class="input">
-                    <el-select v-model="form.typeId"
-                            placeholder="请选择"
-                            slot="prepend">
-                        <el-option v-for="item in typeList1"
-                                :key="item.typeId"
-                                :label="item.typeName"
-                                :value="item.typeId">
-                        </el-option>
-                    </el-select>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
-                <div class="label">所属国家</div>
-                <div class="input">
-                    <el-select v-model="form.contryName"
-                            placeholder="请选择"
-                            slot="prepend"
-                            clearable>
-                        <el-option v-for="(item,i) in contryList"
-                                :key="i"
-                                :label="item.contryName"
-                                :value="item.contryId">
-                        </el-option>
-                    </el-select>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
-                <div class="label">商品标签1</div>
-                <div class="input">
-                    <el-input placeholder="请输入商品标签" v-model="form.goodsLabel1"></el-input>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
-                <div class="label">商品标签2</div>
-                <div class="input">
-                    <el-input placeholder="请输入商品标签" v-model="form.goodsLabel2"></el-input>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
-                <div class="label">商品标签3</div>
-                <div class="input">
-                    <el-input placeholder="请输入商品标签" v-model="form.goodsLabel3"></el-input>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
-                <div class="label">商品价格（元）</div>
-                <div class="input">
-                    <el-input placeholder="请输入商品价格" v-model="form.salePrice" type="number" @input="form.discountedPrice=form.salePrice"></el-input>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
-                <div class="label">详情介绍</div>
-                <div class="flex-center-Y" style="flex-wrap:wrap;width:400px">
-                    <div class="img" v-for="(item,i) in musicPictureList" :key="i" >
-                        <div class="trangle" @click="musicPictureList.splice(i,1)"></div>
-                        <img :src="item.filePath" alt="">
-                    </div>
-                    <div>
-                        <el-upload
-                            class="avatar-uploader"
-                            action=""
-                            :http-request="upload3"
-                            :show-file-list="false"
-                            :before-upload="beforeAvatarUpload">
-                            <div>
-                                <img src="../../assets/icons/upload.png" alt="">
-                            </div>
-                        </el-upload>
-                    </div>
-                </div>
-            </div>
-            <div class="line flex-center-Y">
-                <div class="label">排序码</div>
-                <div class="input"><el-input v-model="form.orderNum" type="number" placeholder="排序码必须为整数"></el-input></div>
-            </div>
-            <div class="bottom flex-center-Y justify-center">
-                <div class="btn1" @click="createVisible = false">取消</div>
-                <div class="btn" @click="commitForm()">确认</div>
-            </div>
-        </el-dialog>
-        <el-dialog :visible.sync="editVisible" title="编辑商品" width="600px" custom-class='shopdialog' @close="clear">
-            <div class="line flex-center-Y">
-                <div class="label">商品图片</div>
+                <div class="label">音频文件</div>
                 <div>
                     <el-upload
-                        class="avatar-uploader"
-                        action=""
-                        :http-request="upload1"
-                        :show-file-list="false"
-                        :before-upload="beforeAvatarUpload">
-                        <img v-if="imageUrl1" :src="imageUrl1" class="avatar">
-                        <div v-else>
-                            <img src="../../assets/icons/upload.png" alt="">
-                        </div>
+                    class="upload-demo"
+                    action=""
+                    :http-request="upload2"
+                    :before-upload="beforeAvatarUpload2"
+                    :on-remove="form.mp3Url=''"
+                    :file-list="fileList">
+                    <el-button size="small" type="primary">点击上传</el-button>
+                    <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
                     </el-upload>
                 </div>
             </div>
@@ -439,17 +325,13 @@
                 </div>
             </div>
             <div class="line flex-center-Y">
-                <div class="label">所属国家</div>
+                <div class="label">是否免费</div>
                 <div class="input">
-                    <el-select v-model="form.contryName"
+                    <el-select v-model="form.isFree"
                             placeholder="请选择"
-                            slot="prepend"
-                            clearable>
-                        <el-option v-for="(item,i) in contryList"
-                                :key="i"
-                                :label="item.contryName"
-                                :value="item.contryId">
-                        </el-option>
+                            slot="prepend">
+                        <el-option label="是" value="Y"></el-option>
+                        <el-option label="否" value="N"></el-option>
                     </el-select>
                 </div>
             </div>
@@ -501,6 +383,150 @@
             <div class="line flex-center-Y">
                 <div class="label">排序码</div>
                 <div class="input"><el-input v-model="form.orderNum" type="number" placeholder="排序码必须为整数"></el-input></div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">是否上架</div>
+                <el-switch
+                    v-model="form.isOnline"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                    active-value="1"
+                    inactive-value="0"
+                    >
+                </el-switch>
+            </div>
+            <div class="bottom flex-center-Y justify-center">
+                <div class="btn1" @click="createVisible = false">取消</div>
+                <div class="btn" @click="commitForm()">确认</div>
+            </div>
+        </el-dialog>
+        <el-dialog :visible.sync="editVisible" title="编辑商品" width="600px" custom-class='shopdialog' @close="clear">
+            <div class="line flex-center-Y">
+                <div class="label">商品图片</div>
+                <div>
+                    <el-upload
+                        class="avatar-uploader"
+                        action=""
+                        :http-request="upload1"
+                        :show-file-list="false"
+                        :before-upload="beforeAvatarUpload">
+                        <img v-if="imageUrl1" :src="imageUrl1" class="avatar">
+                        <div v-else>
+                            <img src="../../assets/icons/upload.png" alt="">
+                        </div>
+                    </el-upload>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">音频文件</div>
+                <div>
+                    <el-upload
+                    class="upload-demo"
+                    action=""
+                    :http-request="upload2"
+                    :before-upload="beforeAvatarUpload2"
+                    :file-list="fileList">
+                    <el-button size="small" type="primary">点击上传</el-button>
+                    <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
+                    </el-upload>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">商品名称</div>
+                <div class="input">
+                    <el-input placeholder="请输入商品名称" v-model="form.skuName"></el-input>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">商品描述</div>
+                <div class="input">
+                    <el-input type="textarea" placeholder="请输入商品描述" v-model="form.subtitleName"></el-input>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">所属分类</div>
+                <div class="input">
+                    <el-select v-model="form.typeId"
+                            placeholder="请选择"
+                            slot="prepend">
+                        <el-option v-for="item in typeList1"
+                                :key="item.typeId"
+                                :label="item.typeName"
+                                :value="item.typeId">
+                        </el-option>
+                    </el-select>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">是否免费</div>
+                <div class="input">
+                    <el-select v-model="form.isFree"
+                            placeholder="请选择"
+                            slot="prepend">
+                        <el-option label="是" value="Y"></el-option>
+                        <el-option label="否" value="N"></el-option>
+                    </el-select>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">商品标签1</div>
+                <div class="input">
+                    <el-input placeholder="请输入商品标签" v-model="form.goodsLabel1"></el-input>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">商品标签2</div>
+                <div class="input">
+                    <el-input placeholder="请输入商品标签" v-model="form.goodsLabel2"></el-input>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">商品标签3</div>
+                <div class="input">
+                    <el-input placeholder="请输入商品标签" v-model="form.goodsLabel3"></el-input>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">商品价格（元）</div>
+                <div class="input">
+                    <el-input placeholder="请输入商品价格" v-model="form.salePrice" type="number" @input="form.discountedPrice=form.salePrice"></el-input>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">详情介绍</div>
+                <div class="flex-center-Y" style="flex-wrap:wrap;width:400px">
+                    <div class="img" v-for="(item,i) in musicPictureList" :key="i" >
+                        <div class="trangle" @click="musicPictureList.splice(i,1)"></div>
+                        <img :src="item.filePath" alt="">
+                    </div>
+                    <div>
+                        <el-upload
+                            class="avatar-uploader"
+                            action=""
+                            :http-request="upload3"
+                            :show-file-list="false"
+                            :before-upload="beforeAvatarUpload">
+                            <div>
+                                <img src="../../assets/icons/upload.png" alt="">
+                            </div>
+                        </el-upload>
+                    </div>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">排序码</div>
+                <div class="input"><el-input v-model="form.orderNum" type="number" placeholder="排序码必须为整数"></el-input></div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">是否上架</div>
+                <el-switch
+                    v-model="form.isOnline"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                    active-value="1"
+                    inactive-value="0"
+                    >
+                </el-switch>
             </div>
             <div class="bottom flex-center-Y justify-center">
                 <div class="btn1" @click="editVisible = false">取消</div>
@@ -547,6 +573,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import axios from 'axios'
 export default {
     data() {
         return {
@@ -556,9 +583,8 @@ export default {
             batchList:[],
             listLoading: false,
             totalCount: 0,
-            form:{skuPicture:"",skuName:"",salePrice:"",discountPrice:"",discountedPrice:""},
+            form:{skuPicture:"",skuName:"",salePrice:"",isOnline:"1",isFree:"Y"},
             addData:[{createdTimes:"",wareNums:""}],
-            searchValue: "",
             tableData: [{}],
             typeFilters: [],
             typeFiltersB: [
@@ -572,87 +598,11 @@ export default {
             params: {
                 pageRow: 10,
                 pageNum: 1,
-                skuName:this.searchValue,
+                skuName:"",
+                isFree:"",
                 typeId:""
             },
             setAlertDialogVisible: false,
-            selectTabsA: [
-                {
-                    name: "1天",
-                    id: 1
-                },
-                {
-                    name: "2天",
-                    id: 2
-                },
-                {
-                    name: "3天",
-                    id: 3
-                },
-                {
-                    name: "4天",
-                    id: 4
-                },
-                {
-                    name: "5天",
-                    id: 5
-                },
-                {
-                    name: "6天",
-                    id: 6
-                },
-                {
-                    name: "7天",
-                    id: 7
-                },
-                {
-                    name: "14天",
-                    id: 14
-                },
-                {
-                    name: "30天",
-                    id: 30
-                }
-            ],
-            qualityoptions:[
-                {
-                    label: "1天",
-                    value: 1
-                },
-                {
-                    label: "一周",
-                    value: 7
-                },
-                {
-                    label: "一个月",
-                    value: 30
-                },
-                {
-                    label: "两个月",
-                    value: 60
-                },
-                {
-                    label: "三个月",
-                    value: 60
-                },
-                {
-                    label: "半年",
-                    value: 180
-                },
-                {
-                    label: "九个月",
-                    value: 270
-                },
-                {
-                    label: "一年",
-                    value: 365
-                },
-                {
-                    label: "两年",
-                    value: 730
-                }
-            ],
-            quality:"",
             addStockVisible:false,
             skuInfoForm:{},
             wareoptions:[],
@@ -693,7 +643,8 @@ export default {
                 {contryId:"KE",contryName:"肯尼亚"},
                 {contryId:"CN",contryName:"中国"},
                 {contryId:"ID",contryName:"印度尼西亚"}
-            ]
+            ],
+            fileList:[],
         };
     },
     created() {
@@ -707,9 +658,6 @@ export default {
         document.getElementsByTagName("body")[0].style.overflow="auto";
     },
     methods: {
-        toBack(){//返回上级
-            this.$router.push({path:'/operation/'})
-            },
         editTop(row){
              this.$confirm('是否保存修改?', '提示', {
                 confirmButtonText: '确定',
@@ -813,6 +761,17 @@ export default {
             }
             return isJPG && isLt2M;
         },
+        beforeAvatarUpload2(file) {
+            var testmsg = file.name.substring(file.name.lastIndexOf('.')+1)
+            const extension = testmsg === 'mp3'
+            if(!extension){
+            this.$message({
+                message:"上传文件只能是mp3格式！",
+                type:'error'
+            })
+            }
+            return extension;
+        },
         upload1(content) {//商品图片
             var formData = new FormData();
             formData.append("file", content.file);
@@ -823,7 +782,20 @@ export default {
             })
                 .then(data => {
                     this.imageUrl1=data.filePath
-                    this.form.skuPicture=data.tempPath
+                    this.form.skuPicture=data.filePath
+                })
+                .catch(e => {});
+        },
+        upload2(content) {//音频文件
+            var formData = new FormData();
+            formData.append("file", content.file);
+            this.api({
+                url: "/uploadfile/uploadMusic",
+                method: "post",
+                data: formData
+            })
+                .then(data => {
+                    this.form.mp3Url=data.filePath
                 })
                 .catch(e => {});
         },
@@ -838,7 +810,7 @@ export default {
                 .then(data => {
                     let img={
                         filePath:data.filePath,
-                        tempPath:data.tempPath
+                        tempPath:data.filePath
                     }
                     this.musicPictureList.push(img)
                 })
@@ -868,11 +840,26 @@ export default {
         },
         commitRemove(){//删除商品
             this.api({
-                    url: "/shopping/sku/delete",
+                    url: "/support/api/addOrUpdateMusic",
                     method: "post",
                     data: {
-                        skuCode:this.selectData.skuCode
-                    }
+                        action:"DELETE",
+                        isAlive:"0",
+                        skuCode:this.selectData.skuCode,
+                        isOnline:this.selectData.isOnline,
+                        skuName:this.selectData.skuName,
+                        salePrice:this.selectData.salePrice*100,
+                        skuPicture:this.selectData.skuPicture,
+                        musicPictureList:this.selectData.musicPictureList,
+                        typeId:this.selectData.typeId,
+                        goodsLabel1:this.selectData.goodsLabel1,
+                        goodsLabel2:this.selectData.goodsLabel2,
+                        goodsLabel3:this.selectData.goodsLabel3,
+                        subtitleName:this.selectData.subtitleName,
+                        orderNum:this.selectData.orderNum,
+                        mp3Url:this.selectData.mp3Url,
+                        isFree:this.selectData.isFree
+                        }
                 })
                     .then(data => {
                         this.getTypeList()
@@ -956,22 +943,24 @@ export default {
                     return;
                 }
             this.api({
-                url: "/shopping/sku/add",
+                url: "/support/api/addOrUpdateMusic",
                 method: "post",
                 data: {
+                    action:"ADD",
+                    isAlive:"1",
+                    isOnline:this.form.isOnline,
                     skuName:this.form.skuName,
-                    salePrice:this.form.salePrice,
-                    discountedPrice:this.form.discountedPrice,
+                    salePrice:this.form.salePrice*100,
                     skuPicture:this.form.skuPicture,
                     musicPictureList:musicPictureList,
                     typeId:this.form.typeId,
                     goodsLabel1:this.form.goodsLabel1,
                     goodsLabel2:this.form.goodsLabel2,
                     goodsLabel3:this.form.goodsLabel3,
-                    contryName:this.form.contryName,
                     subtitleName:this.form.subtitleName,
-                    specifications:this.form.specifications,
-                    orderNum:this.form.orderNum
+                    orderNum:this.form.orderNum,
+                    mp3Url:this.form.mp3Url,
+                    isFree:this.form.isFree
                 }
             }).then(data => {
                 this.$message({
@@ -980,18 +969,19 @@ export default {
                     });
                 this.imageUrl1=''
                 this.form={
-                            skuPicture:"",
                             skuName:"",
                             salePrice:"",
-                            discountedPrice:"",
+                            skuPicture:"",
+                            musicPictureList:"",
                             typeId:"",
                             goodsLabel1:"",
                             goodsLabel2:"",
                             goodsLabel3:"",
                             subtitleName:"",
-                            contryName:"",
-                            specifications:"",
-                            orderNum:""
+                            orderNum:"",
+                            mp3Url:"",
+                            isOnline:"1",
+                            isFree:"Y"
                             }
                 this.musicPictureList=[]
                 this.createVisible=false
@@ -1004,7 +994,7 @@ export default {
         edit(row){
             this.editVisible=true
             this.api({
-                url: "/shopping/sku/find/details",
+                url: "/support/api/updateMusicShow",
                 method: "post",
                 data: {
                     skuCode:row.skuCode
@@ -1014,25 +1004,28 @@ export default {
                 this.imageUrl1=this.form.skuPicture
                 var musicPictureList=[]
                 for(let i in this.form.musicPictureList){
-                    musicPictureList.push({filePath:this.form.musicPictureList[i]})
+                    musicPictureList.push({filePath:this.form.musicPictureList[i].pictureUrl})
                 }
                 this.musicPictureList=musicPictureList
+                this.fileList=[{url:this.form.mp3Url}]
             });
         },
         clear(){
             this.imageUrl1=''
             this.form={
-                        skuPicture:"",
                         skuName:"",
                         salePrice:"",
-                        discountedPrice:"",
+                        skuPicture:"",
+                        musicPictureList:"",
                         typeId:"",
                         goodsLabel1:"",
                         goodsLabel2:"",
                         goodsLabel3:"",
                         subtitleName:"",
-                        contryName:"",
-                        orderNum:""
+                        orderNum:"",
+                        mp3Url:"",
+                        isOnline:"1",
+                        isFree:"Y"
                         }
             this.musicPictureList=[]
         },
@@ -1089,24 +1082,25 @@ export default {
                 }
             
             this.api({
-                url: "/shopping/sku/update",
+                url: "/support/api/addOrUpdateMusic",
                 method: "post",
                 data: {
+                    action:"UPDATE",
+                    isAlive:"1",
+                    isOnline:this.form.isOnline,
                     skuCode:this.form.skuCode,
                     skuName:this.form.skuName,
-                    salePrice:this.form.salePrice,
-                    discountedPrice:this.form.discountedPrice,
+                    salePrice:this.form.salePrice*100,
                     skuPicture:this.form.skuPicture,
                     musicPictureList:musicPictureList,
                     typeId:this.form.typeId,
                     goodsLabel1:this.form.goodsLabel1,
                     goodsLabel2:this.form.goodsLabel2,
                     goodsLabel3:this.form.goodsLabel3,
-                    contryName:this.form.contryName,
                     subtitleName:this.form.subtitleName,
-                    specifications:this.form.specifications,
-                    orderNum:this.form.orderNum
-
+                    orderNum:this.form.orderNum,
+                    mp3Url:this.form.mp3Url,
+                    isFree:this.form.isFree
                 }
             }).then(data => {
                 this.$message({
@@ -1115,18 +1109,19 @@ export default {
                     });
                 this.imageUrl1=''
                 this.form={
-                            skuPicture:"",
                             skuName:"",
                             salePrice:"",
-                            discountedPrice:"",
+                            skuPicture:"",
+                            musicPictureList:"",
                             typeId:"",
                             goodsLabel1:"",
                             goodsLabel2:"",
                             goodsLabel3:"",
                             subtitleName:"",
-                            contryName:"",
-                            specifications:"",
-                            orderNum:""
+                            orderNum:"",
+                            mp3Url:"",
+                            isOnline:"1",
+                            isFree:"Y"
                             }
                 this.musicPictureList=[]
                 this.editVisible=false
@@ -1162,18 +1157,7 @@ export default {
             // console.log(event);
         },
         search() {
-            // if (!this.searchValue) {
-            //     this.$message({
-            //         message: "你没有输入搜索条件哦～",
-            //         type: "warning",
-            //         duration: 2000
-            //     });
-            //     return;
-            // }
-            if (!this.selectedTab) {
-                this.selectedTab = "skuName";
-            }
-            this.params[this.selectedTab] = this.searchValue;
+            this.params.pageNum=1
             this.getList(this.params);
         },
         filterMethod(filters) {
@@ -1194,13 +1178,13 @@ export default {
         getList() {
             this.listLoading = true;
             this.api({
-                url: "/musicList",
+                url: "/support/api/musicList",
                 method: "post",
                 data: this.params
             }).then(data => {
                 this.listLoading = false;
                 this.tableData = data.list;
-                this.totalCount = data.count;
+                this.totalCount = data.totalCount;
             });
         },
         showType(scope) {//添加或编辑分类
@@ -1233,7 +1217,7 @@ export default {
                 return;
             }
             this.api({
-                url: "/addType",
+                url: "/support/api/addType",
                 method: "post",
                 data: {
                     typeName: this.typeName
@@ -1270,7 +1254,7 @@ export default {
                 return;
             }
             this.api({
-                url: "/updateType",
+                url: "/support/api/updateType",
                 method: "post",
                 data: {
                     typeId: this.typeId,
@@ -1293,7 +1277,7 @@ export default {
                 type: "warning"
             }).then(() => {
                 this.api({
-                    url: "/deleteType",
+                    url: "/support/api/deleteType",
                     method: "post",
                     data: {
                         typeId: row.typeId
@@ -1311,7 +1295,7 @@ export default {
         },
         getTypeList(){
             this.api({
-                url: "/typeList",
+                url: "/support/api/typeList",
                 method: "post",
                 data:{}
             }).then(data => {

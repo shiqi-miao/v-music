@@ -238,7 +238,7 @@ export default {
     methods: {
         commitRemove(){//删除账号
             this.api({
-                    url: "/manageDel",
+                    url: "/support/api/manageDel",
                     method: "post",
                     data: {
                         manageId:this.selectData.manageId
@@ -266,7 +266,7 @@ export default {
                     return;
                 }
             this.api({
-                url: "/manageAdd",
+                url: "/support/api/manageAdd",
                 method: "post",
                 data: {
                     manageName:this.form.manageName,
@@ -290,7 +290,7 @@ export default {
         getList() {
             this.listLoading = true;
             this.api({
-                url: "/manageList",
+                url: "/support/api/manageList",
                 method: "post",
                 data: {}
             }).then(data => {

@@ -1,5 +1,5 @@
 <style lang="scss" scoped>
-#baristaOrder{
+#order{
     font-size: 14px;
         background: #F2F4F8;
         border: 1px solid #E2E5EB;
@@ -12,14 +12,14 @@
         }
     }
     .top{
-        height: 185px;
+        height: 75px;
         border: 1px solid #E2E5EB;
         border-bottom: 0;
         background: #fff;
         padding: 20px;
         .select{margin: 0 20px;width: 120px;}
         .input{
-            width: 240px;
+            width: 900px;
             margin-bottom: 20px;
         }
     }
@@ -46,10 +46,10 @@
     .line-height-0{line-height: 0}
 </style>
 <style scoped>
-    div >>> .el-timeline{padding-inline-start: 0;}
-    div >>> .el-timeline-item__content{width: 250px;}
-</style>
-<style>
+    .input >>> .el-input{width: 190px;margin-right: 20px;}
+    .date{margin-right: 20px;}
+    .date >>> .el-date-editor{width: 250px;}
+    .date >>> .el-input__icon{line-height: 27px!important}
     .userdialogClass .el-dialog__header,.userdialogClass .el-dialog__body,.userdialogClass .el-dialog__footer{padding:0}
     .userdialogClass .el-dialog__headerbtn{display: none;}
     .userdialogClass{padding: 30px 60px;}
@@ -57,21 +57,21 @@
     .userTableStyle{color: #333}
     .userTableStyle th>.cell{font-weight: 400}
     .userTableStyle{color: #333;height: 75px;padding: 0!important}
-    #baristaOrder .el-input.is-disabled .el-input__inner{color: #333}
-    #baristaOrder .el-input__inner{height:32px;line-height: 32px;}
-    #baristaOrder .el-input__suffix{line-height: 32px;cursor:pointer;right: 10px;padding-left: 10px;border-left: 1px solid #DCDFE6;}
-    #baristaOrder .select .el-input__suffix,#baristaOrder .select .el-input__icon{border: 0;padding: 0;}
-    #baristaOrder .el-input__icon{line-height:32px;border-left: 1px solid #C0C4CC;padding-left: 5px;}
-    #baristaOrder .el-card__body{height: 100%;padding: 0}
-    #baristaOrder .el-upload{width: 100%;height: 100%}
-    #baristaOrder .el-dialog__header,#baristaOrder .el-dialog__body,#baristaOrder .el-dialog__footer{padding:0}
-    #baristaOrder .el-checkbox__inner{border-radius: 50%}
-    #baristaOrder .el-input__suffix,#baristaOrder .el-input__icon{line-height: 32px;}
+    #order >>> .el-input.is-disabled .el-input__inner{color: #333}
+    #order >>> .el-input__inner{height:32px;line-height: 32px;}
+    #order >>> .el-input__suffix{line-height: 32px;cursor:pointer;right: 10px;padding-left: 10px;}
+    #order >>> .select .el-input__suffix,#order .select .el-input__icon{border: 0;padding: 0;}
+    #order >>> .el-input__icon{line-height:32px;padding-left: 5px;}
+    #order >>> .el-card__body{height: 100%;padding: 0}
+    #order >>> .el-upload{width: 100%;height: 100%}
+    #order >>> .el-dialog__header,#order .el-dialog__body,#order .el-dialog__footer{padding:0}
+    #order >>> .el-checkbox__inner{border-radius: 50%}
+    #order >>> .el-input__suffix,#order .el-input__icon{line-height: 32px;}
     .operatorTableStyle{color: #333}
     .operatorTableStyle th>.cell{font-weight: 600}
-    #baristaOrder .el-tabs{width: 212px;}
+    #order >>> .el-tabs{width: 212px;}
     .el-message-box__headerbtn{z-index: 10}
-    #baristaOrder .el-tabs__item{
+    #order >>> .el-tabs__item{
         font-size: 14px;
         height: 40px;
         line-height: 40px;
@@ -79,58 +79,42 @@
         text-align: center;
     }
 </style>
+<style>
+
+</style>
 <template>
-    <div class="app-container" id="baristaOrder">
+    <div class="app-container" id="order">
         <div class="top">
-            <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
-                <el-tab-pane label="会员购买" name="0"></el-tab-pane>
-                <el-tab-pane label="单曲购买" name="1"></el-tab-pane>
-            </el-tabs>
-            <div class="input">
-                <el-input v-if="activeName=='0'" placeholder="请输入手机号" v-model="searchValue" @input="params.pageNum=1;getList()">
+            <div class="input flex-center-Y">
+                <el-input placeholder="请输入商品名称" v-model="searchValue.skuName">
                     <i
                         class="el-icon-search"
-                        slot="suffix"
-                        @click="params.pageNum=1;getList()">
+                        slot="suffix">
                     </i>
                 </el-input>
-                <el-input v-if="activeName=='1'" placeholder="请输入手机号" v-model="searchValue" @input="params.pageNum=1;getList()">
+                <el-input placeholder="请输入会员等级名称" v-model="searchValue.memGradeName">
                     <i
                         class="el-icon-search"
-                        slot="suffix"
-                        @click="params.pageNum=1;getList()">
+                        slot="suffix">
                     </i>
                 </el-input>
-            </div>
-            <div class="flex-center-Y">
-                <div>订单状态</div> 
-                <div class="select">
-                    <el-select v-model="params.deliveryStatus" placeholder="请选择">
-                        <el-option
-                        label="查看所有"
-                        value="">
-                        </el-option>
-                        <el-option
-                        label="待付款"
-                        value="D">
-                        </el-option>
-                        <el-option
-                        label="已完成"
-                        value="Q">
-                        </el-option>
-                        <el-option
-                        label="已取消"
-                        value="S">
-                        </el-option>
-                    </el-select>
+                <div class="date">
+                    <el-date-picker
+                        class="input-with-date"
+                        v-model="searchValue.date"
+                        type="daterange"
+                        range-separator="-"
+                        start-placeholder="开始时间"
+                        end-placeholder="结束时间"
+                        value-format="yyyy-MM-dd"
+                        >
+                    </el-date-picker>
                 </div>
                 <div class="btn" @click="params.pageNum=1;getList()">搜索</div>
             </div>
-            
         </div>
         <div class="content">
             <el-table
-                    v-show="activeName=='0'"
                     ref="table"
                     header-row-class-name="userTableStyle" 
                     cell-class-name="userCellStyle"
@@ -138,32 +122,20 @@
                     style="width: 100%"
                     :loading='loading'>
                     <el-table-column
-                        prop="acceptName"
-                        label="昵称"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="acceptPhone"
-                        label="手机号"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="manPhone"
-                        label="商品名称"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="totalValue"
-                        label="应付合计"
+                        prop="orderType"
+                        label="账单类型"
                         align="center"
                         min-width="10%">
                     </el-table-column>
                     <el-table-column
                         prop="payPrice"
-                        label="实付款"
+                        label="金额"
+                        align="center"
+                        min-width="10%">
+                    </el-table-column>
+                    <el-table-column
+                        prop="skuName"
+                        label="商品名称"
                         align="center"
                         min-width="10%">
                     </el-table-column>
@@ -172,57 +144,9 @@
                         label="订单状态"
                         align="center"
                         min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="gmtCreated"
-                        label="下单时间"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-            </el-table>
-            <el-table
-                    v-show="activeName=='1'"
-                    ref="tableB"
-                    header-row-class-name="userTableStyle" 
-                    cell-class-name="userCellStyle"
-                    :data="tableDataB"
-                    style="width: 100%"
-                    :loading='loading'>
-                    <el-table-column
-                        prop="acceptName"
-                        label="昵称"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="acceptPhone"
-                        label="手机号"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="manPhone"
-                        label="商品名称"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="totalValue"
-                        label="应付合计"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="payPrice"
-                        label="实付款"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="deliveryStatus"
-                        label="订单状态"
-                        align="center"
-                        min-width="10%">
+                        <template slot-scope="scope">
+                            <span>{{scope.row.isPay=='-1'?'已取消':(scope.row.isPay=='0'?'待支付':'已支付')}}</span>
+                        </template>
                     </el-table-column>
                     <el-table-column
                         prop="gmtCreated"
@@ -248,20 +172,14 @@ import { mapGetters } from "vuex";
 export default {
     data() {
         return {
-            activeName:"0",
             loading:false,
             tableData:[
             ],
-            tableDataB:[
-                
-            ],
-            searchValue:'',
+            searchValue:{skuName:"",memGradeName:"",date:[]},
             selectData:"",
             params:{
                 pageNum:1,
                 pageRow:10,
-                deliveryStatus:"",
-                appointmentStatus:""
             },
             totalCount:0
 
@@ -270,6 +188,33 @@ export default {
     created() {
         document.getElementsByTagName("body")[0].style.minWidth="1100px";
         document.getElementsByTagName("body")[0].style.overflow="auto";
+        //时间默认为近一个月
+        function getLastMonth() {
+            var now = new Date();
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;//0-11表示1-12月
+            var day = now.getDate();
+            var dateObj = {};
+            dateObj.now = year + '-' + month + '-' + day; 
+            var nowMonthDay = new Date(year, month, 0).getDate();    //当前月的总天数
+            if(month - 1 <= 0){ //如果是1月，年数往前推一年<br>　　　　 
+                dateObj.last = (year - 1) + '-' + 12 + '-' + day;
+            }else{
+                var lastMonthDay = new Date(year, (parseInt(month) - 1), 0).getDate();  
+                if(lastMonthDay < day){    //1个月前所在月的总天数小于现在的天日期
+                    if(day < nowMonthDay){        //当前天日期小于当前月总天数
+                        dateObj.last = year + '-' + (month - 1) + '-' + (lastMonthDay - (nowMonthDay - day));
+                    }else{
+                        dateObj.last = year + '-' + (month - 1) + '-' + lastMonthDay;
+                    }
+                }else{
+                    dateObj.last = year + '-' + (month - 1) + '-' + day;
+                }
+            }
+            return dateObj;
+        }
+        this.searchValue.date=[getLastMonth().last,getLastMonth().now]
+        //时间默认为近一个月
         this.getList()
     },
 
@@ -291,36 +236,22 @@ export default {
             this.getList(this.params);
         },
         getList() {
-            // this.params.manageId = this.userId
-            // this.params.username = this.userName
+            this.params.startTime=this.searchValue.date?this.searchValue.date[0]:''
+            this.params.endTime=this.searchValue.date?this.searchValue.date[1]:''
+            this.params.skuName=this.searchValue.skuName
+            this.params.memGradeName=this.searchValue.memGradeName
             this.loading=true
-            if(this.activeName=='0'){
-                this.params.acceptPhone=this.searchValue
-                this.api({
-                        url: "/shopping/order/show",
-                        method: "post",
-                        data: this.params
-                    }).then(data => {
-                        this.loading=false
-                        this.tableData = data.shoppingOrderInfoList
-                        this.totalCount=data.totalCount
-                    }).catch(err=>{
-                        this.loading=false
-                    });
-            }else{
-                this.params.userPhone=this.searchValue
-                this.api({
-                        url: "/shopping/baristaOrderFind",
-                        method: "post",
-                        data: this.params
-                    }).then(data => {
-                        this.loading=false
-                        this.tableDataB = data.list
-                        this.totalCount=data.totalCount
-                    }).catch(err=>{
-                        this.loading=false
-                    });
-            }
+            this.api({
+                    url: "/support/api/orderInfoList",
+                    method: "post",
+                    data: this.params
+                }).then(data => {
+                    this.loading=false
+                    this.tableData = data.list
+                    this.totalCount=data.totalCount
+                }).catch(err=>{
+                    this.loading=false
+                });
         }
     },
     computed: {

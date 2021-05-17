@@ -30,11 +30,11 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/support': {
+      '/': {
         target: 'http://192.168.1.214:8181',
         logLevel:'debug',
         pathRewrite: {
-          '^/support': '/support/api'
+          '^/': '/'
         }
       }
     },

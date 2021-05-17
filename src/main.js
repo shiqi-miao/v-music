@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import 'normalize.css/normalize.css'; // A modern alternative to CSS resets
 import ElementUI from 'element-ui';
-import { borderBox1 } from '@jiaminghi/data-view'
 import 'element-ui/lib/theme-chalk/index.css';
 import locale from 'element-ui/lib/locale/lang/zh-CN';
 import animated from 'animate.css' ;
@@ -22,7 +21,6 @@ import { hasPermission } from './utils/hasPermission';
 Vue.use(animated)
 Vue.use(VueAwesomeSwiper)　
 Vue.use(ElementUI, { locale });
-Vue.use(borderBox1)
 Vue.prototype.api = api;
 //全局的常量
 Vue.prototype.hasPerm = hasPermission;
@@ -35,12 +33,6 @@ new Vue({
   template: '<App/>',
   components: { App },
 });
-// Vue.http.interceptors.push((request, next) => {
-
-//   request.credentials = true;
-
-//   next();
-// });
 
 import {
   Pagination,

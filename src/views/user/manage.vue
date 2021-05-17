@@ -186,44 +186,20 @@
                     style="width: 100%"
                     :loading='loading'>
                     <el-table-column
-                        prop="acceptName"
-                        label="昵称"
+                        prop="gradeName"
+                        label="会员等级名称"
                         align="center"
                         min-width="10%">
                     </el-table-column>
                     <el-table-column
-                        prop="acceptPhone"
-                        label="手机号"
+                        prop="cycleTerm"
+                        label="年限（年）"
                         align="center"
                         min-width="10%">
                     </el-table-column>
                     <el-table-column
-                        prop="manPhone"
-                        label="商品名称"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="totalValue"
-                        label="应付合计"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="payPrice"
-                        label="实付款"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="deliveryStatus"
-                        label="订单状态"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="gmtCreated"
-                        label="下单时间"
+                        prop="amount"
+                        label="价格"
                         align="center"
                         min-width="10%">
                     </el-table-column>
@@ -231,18 +207,15 @@
                                   width="150"
                                   align="center">
                       <template slot-scope="scope">
-                          <span @click="deleteCoupon(scope.row)"
-                                class="blue">
-                              编辑
-                          </span>
-                          <span @click="deleteCoupon(scope.row)"
+                          <span @click="deleteVip(scope.row)"
                                 class="blue">
                               删除
                           </span>
                       </template>
                   </el-table-column>
             </el-table>
-            <div class="pagination-line">
+            <div class="pagination-line"
+                v-show="activeName=='0'">
                 <el-pagination background
                             @current-change="currentChange"
                             :current-page="params.pageNum"
@@ -262,19 +235,19 @@
             <div class="kupperDialog">
                 <div class="flex-center-Y font-bold smallMt">
                     <div class="W-30">会员等级名称</div>
-                    <div class="  flex-center-Y"><el-input v-model="selectData.equityName" placeholder="请输入会员等级名称"></el-input></div>
+                    <div class="  flex-center-Y"><el-input v-model="form.gradeName" placeholder="请输入会员等级名称"></el-input></div>
                 </div>
                 <div class="flex-center-Y smallMt">
                     <div class="W-30 font-bold">期限</div>
-                    <div class="  flex-center-Y"><el-input type="number" v-model="selectData.equityDis" placeholder="请输入期限"></el-input>&nbsp;年</div>
+                    <div class="  flex-center-Y"><el-input type="number" v-model="form.cycleTerm" placeholder="请输入期限"></el-input>&nbsp;年</div>
                 </div>
                 <div class="flex-center-Y smallMt">
                     <div class="W-30 font-bold">购买价格</div>
-                    <div class="  flex-center-Y"><el-input type="number" v-model="selectData.equityPrice" placeholder="请输入线上购买价格"></el-input>&nbsp;元</div>
+                    <div class="  flex-center-Y"><el-input type="number" v-model="form.amount" placeholder="请输入线上购买价格"></el-input>&nbsp;元</div>
                 </div>
                 <div class="flex-center-Y smallMt">
                     <div class="W-30 font-bold">权益描述</div>
-                    <div class="  flex-center-Y"><el-input type="textarea" v-model="selectData.equityPrice" placeholder="请输入权益描述"></el-input></div>
+                    <div class="  flex-center-Y"><el-input type="textarea" v-model="form.rightsInfo" placeholder="请输入权益描述"></el-input></div>
                 </div>
                 <div class="bottom flex-center-Y justify-center" style="margin-top:40px">
                     <div class="btn1" @click="backIndex">取消</div>
@@ -305,8 +278,14 @@ export default {
                 appointmentStatus:""
             },
             totalCount:0,
-            indexVisible:false
-
+            indexVisible:false,
+            dialogTitle:"添加会员等级",
+            form:{
+                gradeName:"",
+                cycleTerm:"",
+                amount:"",
+                rightsInfo:""
+                }
         };
     },
     created() {
@@ -317,76 +296,60 @@ export default {
 
     methods: {
         addConfig(){//新建
-            this.dialogTitle="添加配置"
+            this.dialogTitle="添加会员等级"
             this.indexVisible=true
         },
         
         saveIndex(){
-            if(!this.selectData.equityName){
+            if(!this.form.gradeName){
                 this.$message.error('请输入会员名称~');
                 return;
             }
-            if(!/^[0-9]+([.]{1}[0-9]+){0,1}$/.test(this.selectData.equityPrice)){
+            if(!/^[0-9]+([.]{1}[0-9]+){0,1}$/.test(this.form.cycleTerm)){
                 this.$message.error('年限只能填入数字哦~');
                 return;
             }
-            if(!/^[0-9]+([.]{1}[0-9]+){0,1}$/.test(this.selectData.equityPrice)){
+            if(!/^[0-9]+([.]{1}[0-9]+){0,1}$/.test(this.form.amount)){
                 this.$message.error('购买价格只能填入数字哦~');
                 return;
             }
+            var commitForm=JSON.parse(JSON.stringify(this.form))
+            commitForm.amount=commitForm.amount*100
             if(this.dialogTitle=="添加配置"){
             this.api({
-                    url: "/kupper/addUserEquity",
+                    url: "/support/api/memberSet",
                     method: "post",
-                    data:this.selectData
+                    data:commitForm
                 }).then(data => {
                     this.$message.success('添加成功!');
                     this.indexVisible=false
                     this.getList()
-                    this.selectData.equityName= ""
-                    this.selectData.equityPrice=""
-                    this.selectData.giftUuid=""
-                    this.selectData.equityDis=""
-                    this.selectData.equityPic1=""
-                    this.selectData.equityPic2=""
-                    this.selectData.equityPic3=""
-                    this.selectData.equityPicture1=""
-                    this.selectData.equityPicture2=""
-                    this.selectData.equityPicture3=""
+                    this.form.gradeName="",
+                    this.form.cycleTerm="",
+                    this.form.amount="",
+                    this.form.rightsInfo=""
                 });}else{
                     this.api({
-                    url: "/kupper/updateUserEquity",
+                    url: "/support/api/memberSet",
                     method: "post",
-                    data:this.selectData
+                    data:commitForm
                 }).then(data => {
                     this.$message.success('保存成功!');
                     this.indexVisible=false
                     this.getList()
-                    this.selectData.equityName= ""
-                    this.selectData.equityPrice=""
-                    this.selectData.giftUuid=""
-                    this.selectData.equityDis=""
-                    this.selectData.equityPic1=""
-                    this.selectData.equityPic2=""
-                    this.selectData.equityPic3=""
-                    this.selectData.equityPicture1=""
-                    this.selectData.equityPicture2=""
-                    this.selectData.equityPicture3=""
+                    this.form.gradeName="",
+                    this.form.cycleTerm="",
+                    this.form.amount="",
+                    this.form.rightsInfo=""
                 });
                 }
         },
         backIndex(){
             this.indexVisible=false
-            this.selectData.equityName= "",
-            this.selectData.equityPrice="",
-            this.selectData.giftUuid="",
-            this.selectData.equityDis="",
-            this.selectData.equityPic1="",
-            this.selectData.equityPic2="",
-            this.selectData.equityPic3="",
-            this.selectData.equityPicture1="",
-            this.selectData.equityPicture2="",
-            this.selectData.equityPicture3="",
+            this.form.gradeName="",
+            this.form.cycleTerm="",
+            this.form.amount="",
+            this.form.rightsInfo=""
             this.getList()
         },
         handleClick(){
@@ -423,20 +386,41 @@ export default {
                         this.loading=false
                     });
             }else{
-                this.params.userPhone=this.searchValue
                 this.api({
-                        url: "/shopping/baristaOrderFind",
+                        url: "/support/api/memberList",
                         method: "post",
-                        data: this.params
+                        data: {}
                     }).then(data => {
                         this.loading=false
-                        this.tableDataB = data.list
-                        this.totalCount=data.totalCount
+                        this.tableDataB = data
                     }).catch(err=>{
                         this.loading=false
                     });
             }
-        }
+        },
+        deleteVip(row){
+            this.$confirm('是否删除该会员等级？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                    this.api({
+                        url: "/support/api/memberDel",
+                        method: "post",
+                        data: {
+                            memberGradeId:row.memberGradeId,
+                        }
+                    }).then(data => {
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        })
+                        this.getList()
+                    })
+                }).catch(() => {
+
+                })
+        },
     },
     computed: {
         ...mapGetters(["userId",'userName'])

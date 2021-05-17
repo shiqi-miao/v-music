@@ -30,25 +30,15 @@ https://m.bud88.com
 
 ## Project setup
 ```
-yarn install
+npm install
 ```
 
 ### Compiles and hot-reloads for development
 ```
-yarn run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
 ```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
+npm run build
 ```

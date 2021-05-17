@@ -5,7 +5,6 @@ import 'element-ui/lib/theme-chalk/index.css';
 import locale from 'element-ui/lib/locale/lang/zh-CN';
 import animated from 'animate.css' ;
 import 'swiper/dist/css/swiper.css';
-import VueAwesomeSwiper from 'vue-awesome-swiper';
 import App from './App';
 import router from './router';
 import store from './store';
@@ -19,7 +18,6 @@ import { hasPermission } from './utils/hasPermission';
 
 // this.socketApi.sendSock(agentData, this.getConfigResult);
 Vue.use(animated)
-Vue.use(VueAwesomeSwiper)　
 Vue.use(ElementUI, { locale });
 Vue.prototype.api = api;
 //全局的常量
@@ -104,15 +102,9 @@ import {
   Notification,
 } from 'element-ui';
 
-import VeLine from 'v-charts/lib/line.common';
-import VeHistogram from 'v-charts/lib/histogram.common';
-import VeBar from 'v-charts/lib/bar.common';
-import VeRing from 'v-charts/lib/ring.common';
-import infiniteScroll from 'vue-infinite-scroll';
 
 
 
-Vue.use(infiniteScroll);
 Vue.use(Pagination);
 Vue.use(Dialog);
 Vue.use(Autocomplete);

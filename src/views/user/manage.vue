@@ -3,8 +3,9 @@
     font-size: 14px;
         background: #F2F4F8;
         border: 1px solid #E2E5EB;
+        height: 100%;
         .content{
-            min-height: 80vh;
+            min-height: calc(100% - 135px);
             background: #fff;
             border: 1px solid #E2E5EB;
             padding: 20px;
@@ -12,14 +13,14 @@
         }
     }
     .top{
-        height: 185px;
+        height: 135px;
         border: 1px solid #E2E5EB;
         border-bottom: 0;
         background: #fff;
         padding: 20px;
         .select{margin: 0 20px;width: 120px;}
         .input{
-            width: 240px;
+            width: 800px;
             margin-bottom: 20px;
         }
     }
@@ -47,30 +48,27 @@
     .line-height-0{line-height: 0}
 </style>
 <style scoped>
-    div >>> .el-timeline{padding-inline-start: 0;}
-    div >>> .el-timeline-item__content{width: 250px;}
     .userdialogClass{padding: 30px 60px;}
     .userdialogClass .title{font-size: 18px;margin-bottom: 32px;line-height:1.5}
     div >>> .el-dialog__body{padding-top: 0;}
-</style>
-<style>
     .userTableStyle{color: #333}
     .userTableStyle th>.cell{font-weight: 400}
     .userTableStyle{color: #333;height: 75px;padding: 0!important}
-    #baristaOrder .el-input.is-disabled .el-input__inner{color: #333}
-    #baristaOrder .el-input__inner{height:32px;line-height: 32px;}
-    #baristaOrder .el-input__suffix{line-height: 32px;cursor:pointer;right: 10px;padding-left: 10px;border-left: 1px solid #DCDFE6;}
-    #baristaOrder .select .el-input__suffix,#baristaOrder .select .el-input__icon{border: 0;padding: 0;}
-    #baristaOrder .el-input__icon{line-height:32px;border-left: 1px solid #C0C4CC;padding-left: 5px;}
-    #baristaOrder .el-card__body{height: 100%;padding: 0}
-    #baristaOrder .el-upload{width: 100%;height: 100%}
-    #baristaOrder .el-checkbox__inner{border-radius: 50%}
-    #baristaOrder .el-input__suffix,#baristaOrder .el-input__icon{line-height: 32px;}
+    #baristaOrder >>> .el-input.is-disabled .el-input__inner{color: #333}
+    #baristaOrder >>> .el-input{width: 190px;}
+    #baristaOrder >>> .el-input__inner{height:32px;line-height: 32px;}
+    #baristaOrder >>> .el-input__prefix{line-height: 32px;cursor:pointer;padding-left: 5px;}
+    #baristaOrder >>> .select .el-input__prefix,#baristaOrder .select .el-input__icon{border: 0;padding: 0;}
+    #baristaOrder >>> .el-input__icon{line-height:32px;padding-left: 5px;}
+    #baristaOrder >>> .el-card__body{height: 100%;padding: 0}
+    #baristaOrder >>> .el-upload{width: 100%;height: 100%}
+    #baristaOrder >>> .el-checkbox__inner{border-radius: 50%}
+    #baristaOrder >>> .el-input__prefix,#baristaOrder .el-input__icon{line-height: 32px;}
     .operatorTableStyle{color: #333}
     .operatorTableStyle th>.cell{font-weight: 600}
-    #baristaOrder .el-tabs{width: 212px;}
-    .el-message-box__headerbtn{z-index: 10}
-    #baristaOrder .el-tabs__item{
+    #baristaOrder >>> .el-tabs{width: 212px;}
+    #baristaOrder >>> .el-message-box__headerbtn{z-index: 10}
+    #baristaOrder >>> .el-tabs__item{
         font-size: 14px;
         height: 40px;
         line-height: 40px;
@@ -90,40 +88,29 @@
                 <div class="btn" @click="addConfig">添加配置</div>
               </div>
             </div>
-            <div class="input">
-                <el-input v-if="activeName=='0'" placeholder="请输入手机号" v-model="searchValue" @input="params.pageNum=1;getList()">
+            <div class="input flex-center-Y">
+                <el-input v-if="activeName=='0'" placeholder="请输入手机号" v-model="searchValue" style="margin-right:20px" @input="params.pageNum=1;getList()" clearable>
                     <i
                         class="el-icon-search"
-                        slot="suffix"
+                        slot="prefix"
                         @click="params.pageNum=1;getList()">
                     </i>
                 </el-input>
-            </div>
-            <div class="flex-center-Y" v-if="activeName=='0'">
-                <div>会员等级</div> 
-                <div class="select">
-                    <el-select v-model="params.deliveryStatus" placeholder="请选择">
-                        <el-option
-                        label="查看所有"
-                        value="">
-                        </el-option>
-                        <el-option
-                        label="待付款"
-                        value="D">
-                        </el-option>
-                        <el-option
-                        label="已完成"
-                        value="Q">
-                        </el-option>
-                        <el-option
-                        label="已取消"
-                        value="S">
-                        </el-option>
-                    </el-select>
+                <div class="flex-center-Y" v-if="activeName=='0'">
+                    <div>会员等级</div> 
+                    <div class="select">
+                        <el-select v-model="params.memberGradeId" placeholder="请选择" @change="params.pageNum=1;getList()" clearable>
+                            <el-option
+                            v-for="(item,i) in gradeList"
+                            :key="i"
+                            :label="item.gradeName"
+                            :value="item.memberGradeId">
+                            </el-option>
+                        </el-select>
+                    </div>
+                    <!-- <div class="btn" @click="params.pageNum=1;getList()" style="margin-left:80px">搜索</div> -->
                 </div>
-                <div class="btn" @click="params.pageNum=1;getList()">搜索</div>
             </div>
-            
         </div>
         <div class="content">
             <el-table
@@ -135,46 +122,37 @@
                     style="width: 100%"
                     :loading='loading'>
                     <el-table-column
-                        prop="acceptName"
+                        prop="date"
+                        label="头像"
+                        min-width="10%"
+                        align="center">
+                        <template slot-scope="scope">
+                            <div class="line-height-0">
+                            <img class='img' v-if="scope.row.portrait" :src="scope.row.portrait" alt="">
+                            <img class='img' v-else src="../../assets/super/logo3.png" alt="">
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="nickName"
                         label="昵称"
                         align="center"
                         min-width="10%">
                     </el-table-column>
                     <el-table-column
-                        prop="acceptPhone"
+                        prop="userPhone"
                         label="手机号"
                         align="center"
                         min-width="10%">
                     </el-table-column>
                     <el-table-column
-                        prop="manPhone"
-                        label="商品名称"
+                        prop="userSex"
+                        label="性别"
                         align="center"
                         min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="totalValue"
-                        label="应付合计"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="payPrice"
-                        label="实付款"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="deliveryStatus"
-                        label="订单状态"
-                        align="center"
-                        min-width="10%">
-                    </el-table-column>
-                    <el-table-column
-                        prop="gmtCreated"
-                        label="下单时间"
-                        align="center"
-                        min-width="10%">
+                        <template slot-scope="scope">
+                            <span>{{scope.row.userSex=='2'?'女':'男'}}</span>
+                        </template>
                     </el-table-column>
             </el-table>
             <el-table
@@ -239,7 +217,7 @@
                 </div>
                 <div class="flex-center-Y smallMt">
                     <div class="W-30 font-bold">期限</div>
-                    <div class="  flex-center-Y"><el-input type="number" v-model="form.cycleTerm" placeholder="请输入期限"></el-input>&nbsp;年</div>
+                    <div class="  flex-center-Y"><el-input type="number" v-model="form.cycleTerm" placeholder="请输入期限"></el-input>&nbsp;年&nbsp;(0为永久)</div>
                 </div>
                 <div class="flex-center-Y smallMt">
                     <div class="W-30 font-bold">购买价格</div>
@@ -273,9 +251,7 @@ export default {
             selectData:"",
             params:{
                 pageNum:1,
-                pageRow:10,
-                deliveryStatus:"",
-                appointmentStatus:""
+                pageRow:10
             },
             totalCount:0,
             indexVisible:false,
@@ -285,12 +261,21 @@ export default {
                 cycleTerm:"",
                 amount:"",
                 rightsInfo:""
-                }
+                },
+            gradeList:[]
         };
     },
     created() {
-        document.getElementsByTagName("body")[0].style.minWidth="1100px";
+        document.getElementsByTagName("body")[0].style.minWidth="1000px";
         document.getElementsByTagName("body")[0].style.overflow="auto";
+        this.api({
+                url: "/support/api/memberGradeList",
+                method: "post",
+                data: {}
+            }).then(data => {
+                this.gradeList = data
+            }).catch(err=>{
+            });
         this.getList()
     },
 
@@ -369,25 +354,23 @@ export default {
             this.getList(this.params);
         },
         getList() {
-            // this.params.manageId = this.userId
-            // this.params.username = this.userName
             this.loading=true
             if(this.activeName=='0'){
-                this.params.acceptPhone=this.searchValue
+                this.params.userPhone=this.searchValue
                 this.api({
-                        url: "/shopping/order/show",
+                        url: "/support/api/memberList",
                         method: "post",
                         data: this.params
                     }).then(data => {
                         this.loading=false
-                        this.tableData = data.shoppingOrderInfoList
+                        this.tableData = data.list
                         this.totalCount=data.totalCount
                     }).catch(err=>{
                         this.loading=false
                     });
             }else{
                 this.api({
-                        url: "/support/api/memberList",
+                        url: "/support/api/memberGradeList",
                         method: "post",
                         data: {}
                     }).then(data => {

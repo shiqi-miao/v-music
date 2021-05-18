@@ -144,7 +144,7 @@
 #shop .el-input__icon{line-height:32px;
 // border-left: 1px solid #C0C4CC;padding-left: 5px;
 }
-#shop .el-input__suffix{line-height: 32px;cursor:pointer;right: 10px;padding-left: 10px;
+#shop .el-input__prefix{line-height: 32px;cursor:pointer;padding-left: 5px;
 // border-left: 1px solid #DCDFE6;
 }
 #shop .shopdialog{height: 600px;}
@@ -164,10 +164,10 @@
         <div class="top">
             <div class="flex-center-Y" style="margin-bottom:20px">
                 <div class="searchInput">
-                    <el-input placeholder="请输入商品名称" v-model="params.skuName" @input="search">
+                    <el-input placeholder="请输入商品名称" v-model="params.skuName" @input="search" clearable>
                         <i
                             class="el-icon-search"
-                            slot="suffix"
+                            slot="prefix"
                             @click="search">
                         </i>
                     </el-input>
@@ -176,15 +176,15 @@
                         <el-select v-model="params.isFree" clearable="" placeholder="商品类型" @change="search">
                             <el-option
                             label="付费"
-                            value="Y">
+                            value="N">
                             </el-option>
                             <el-option
                             label="免费"
-                            value="N">
+                            value="Y">
                             </el-option>
                         </el-select>
                     </div>
-                <div class="btn" @click="createVisible=true">创建商品</div>
+                <div class="btn" @click="createVisible=true;fileList=[]">创建商品</div>
             </div>
             <div>
                 商品分类: 
@@ -237,10 +237,10 @@
                              align="center">
             </el-table-column>
             <el-table-column prop="isRecommend"
-                             label="是否免费"
+                             label="是否精品歌曲"
                              align="center">
                 <template slot-scope="scope">
-                    <span>{{scope.row.isFree=='Y'?'是':'否'}}</span>
+                    <span>{{scope.row.isFree=='N'?'是':'否'}}</span>
                 </template>
             </el-table-column>
             <el-table-column 
@@ -291,7 +291,7 @@
                     action=""
                     :http-request="upload2"
                     :before-upload="beforeAvatarUpload2"
-                    :on-remove="form.mp3Url=''"
+                    :on-remove="remove"
                     :file-list="fileList">
                     <el-button size="small" type="primary">点击上传</el-button>
                     <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
@@ -325,13 +325,13 @@
                 </div>
             </div>
             <div class="line flex-center-Y">
-                <div class="label">是否免费</div>
+                <div class="label">是否精品歌曲</div>
                 <div class="input">
                     <el-select v-model="form.isFree"
                             placeholder="请选择"
                             slot="prepend">
-                        <el-option label="是" value="Y"></el-option>
-                        <el-option label="否" value="N"></el-option>
+                        <el-option label="是" value="N"></el-option>
+                        <el-option label="否" value="Y"></el-option>
                     </el-select>
                 </div>
             </div>
@@ -425,6 +425,7 @@
                     action=""
                     :http-request="upload2"
                     :before-upload="beforeAvatarUpload2"
+                    :on-remove="remove"
                     :file-list="fileList">
                     <el-button size="small" type="primary">点击上传</el-button>
                     <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
@@ -458,13 +459,13 @@
                 </div>
             </div>
             <div class="line flex-center-Y">
-                <div class="label">是否免费</div>
+                <div class="label">是否精品歌曲</div>
                 <div class="input">
                     <el-select v-model="form.isFree"
                             placeholder="请选择"
                             slot="prepend">
-                        <el-option label="是" value="Y"></el-option>
-                        <el-option label="否" value="N"></el-option>
+                        <el-option label="是" value="N"></el-option>
+                        <el-option label="否" value="Y"></el-option>
                     </el-select>
                 </div>
             </div>
@@ -652,9 +653,7 @@ export default {
             this.params.skuCodes=''
         }
         this.getTypeList()
-        // this.getList();
-        // this.getWare()
-        document.getElementsByTagName("body")[0].style.minWidth="1400px";
+        document.getElementsByTagName("body")[0].style.minWidth="1000px";
         document.getElementsByTagName("body")[0].style.overflow="auto";
     },
     methods: {
@@ -782,7 +781,7 @@ export default {
             })
                 .then(data => {
                     this.imageUrl1=data.filePath
-                    this.form.skuPicture=data.filePath
+                    this.form.skuPicture=data.tempPath
                 })
                 .catch(e => {});
         },
@@ -795,9 +794,13 @@ export default {
                 data: formData
             })
                 .then(data => {
-                    this.form.mp3Url=data.filePath
+                    this.form.mp3Url=data.tempPath
                 })
                 .catch(e => {});
+        },
+        remove(fileList){
+            console.log(99999)
+            this.form.mp3Url=""
         },
         upload3(content) {//商品图片
             var formData = new FormData();
@@ -810,7 +813,7 @@ export default {
                 .then(data => {
                     let img={
                         filePath:data.filePath,
-                        tempPath:data.filePath
+                        tempPath:data.tempPath
                     }
                     this.musicPictureList.push(img)
                 })
@@ -907,6 +910,13 @@ export default {
                     });
                     return;
                 }
+            if(!this.form.mp3Url){
+                    this.$message({
+                        type: "warning",
+                        message: "请上传音频文件"
+                    });
+                    return;
+                }
             if(!this.form.subtitleName){
                     this.$message({
                         type: "warning",
@@ -1000,6 +1010,7 @@ export default {
                     skuCode:row.skuCode
                 }
             }).then(data => {
+                console.log(data.fileName)
                 this.form=data
                 this.imageUrl1=this.form.skuPicture
                 var musicPictureList=[]
@@ -1007,7 +1018,7 @@ export default {
                     musicPictureList.push({filePath:this.form.musicPictureList[i].pictureUrl})
                 }
                 this.musicPictureList=musicPictureList
-                this.fileList=[{url:this.form.mp3Url}]
+                this.fileList=[{name:data.fileName,url:this.form.mp3Url}]
             });
         },
         clear(){
@@ -1042,6 +1053,13 @@ export default {
                     this.$message({
                         type: "warning",
                         message: "请输入商品名称"
+                    });
+                    return;
+                }
+            if(!this.form.mp3Url){
+                    this.$message({
+                        type: "warning",
+                        message: "请上传音频文件"
                     });
                     return;
                 }

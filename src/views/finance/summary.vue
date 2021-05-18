@@ -3,8 +3,9 @@
     font-size: 14px;
         background: #F2F4F8;
         border: 1px solid #E2E5EB;
+        height: 100%;
         .content{
-            min-height: 80vh;
+            min-height: calc(100% - 75px);
             background: #fff;
             border: 1px solid #E2E5EB;
             padding: 20px;
@@ -59,14 +60,14 @@
     .userTableStyle{color: #333;height: 75px;padding: 0!important}
     #order >>> .el-input.is-disabled .el-input__inner{color: #333}
     #order >>> .el-input__inner{height:32px;line-height: 32px;}
-    #order >>> .el-input__suffix{line-height: 32px;cursor:pointer;right: 10px;padding-left: 10px;}
-    #order >>> .select .el-input__suffix,#order .select .el-input__icon{border: 0;padding: 0;}
+    #order >>> .el-input__prefix{line-height: 32px;cursor:pointer;padding-left: 5px;}
+    #order >>> .select .el-input__prefix,#order .select .el-input__icon{border: 0;padding: 0;}
     #order >>> .el-input__icon{line-height:32px;padding-left: 5px;}
     #order >>> .el-card__body{height: 100%;padding: 0}
     #order >>> .el-upload{width: 100%;height: 100%}
     #order >>> .el-dialog__header,#order .el-dialog__body,#order .el-dialog__footer{padding:0}
     #order >>> .el-checkbox__inner{border-radius: 50%}
-    #order >>> .el-input__suffix,#order .el-input__icon{line-height: 32px;}
+    #order >>> .el-input__prefix,#order .el-input__icon{line-height: 32px;}
     .operatorTableStyle{color: #333}
     .operatorTableStyle th>.cell{font-weight: 600}
     #order >>> .el-tabs{width: 212px;}
@@ -86,16 +87,16 @@
     <div class="app-container" id="order">
         <div class="top">
             <div class="input flex-center-Y">
-                <el-input placeholder="请输入商品名称" v-model="searchValue.skuName">
+                <el-input placeholder="请输入商品名称" v-model="searchValue.skuName" @input="params.pageNum=1;getList()" clearable>
                     <i
                         class="el-icon-search"
-                        slot="suffix">
+                        slot="prefix">
                     </i>
                 </el-input>
-                <el-input placeholder="请输入会员等级名称" v-model="searchValue.memGradeName">
+                <el-input placeholder="请输入会员等级名称" v-model="searchValue.memGradeName" @input="params.pageNum=1;getList()" clearable>
                     <i
                         class="el-icon-search"
-                        slot="suffix">
+                        slot="prefix">
                     </i>
                 </el-input>
                 <div class="date">
@@ -107,10 +108,11 @@
                         start-placeholder="开始时间"
                         end-placeholder="结束时间"
                         value-format="yyyy-MM-dd"
+                         @change="params.pageNum=1;getList()"
                         >
                     </el-date-picker>
                 </div>
-                <div class="btn" @click="params.pageNum=1;getList()">搜索</div>
+                <!-- <div class="btn" @click="params.pageNum=1;getList()">搜索</div> -->
             </div>
         </div>
         <div class="content">
@@ -122,8 +124,14 @@
                     style="width: 100%"
                     :loading='loading'>
                     <el-table-column
+                        prop="orderCode"
+                        label="订单编号"
+                        align="center"
+                        min-width="10%">
+                    </el-table-column>
+                    <el-table-column
                         prop="orderType"
-                        label="账单类型"
+                        label="订单类型"
                         align="center"
                         min-width="10%">
                     </el-table-column>
@@ -134,8 +142,20 @@
                         min-width="10%">
                     </el-table-column>
                     <el-table-column
-                        prop="skuName"
+                        prop="memGradeName"
                         label="商品名称"
+                        align="center"
+                        min-width="10%">
+                    </el-table-column>
+                    <el-table-column
+                        prop="userName"
+                        label="昵称"
+                        align="center"
+                        min-width="10%">
+                    </el-table-column>
+                    <el-table-column
+                        prop="userPhone"
+                        label="手机号码"
                         align="center"
                         min-width="10%">
                     </el-table-column>
@@ -145,7 +165,7 @@
                         align="center"
                         min-width="10%">
                         <template slot-scope="scope">
-                            <span>{{scope.row.isPay=='-1'?'已取消':(scope.row.isPay=='0'?'待支付':'已支付')}}</span>
+                            <span :style="scope.row.isPay=='-1'?'color:red':(scope.row.isPay=='0'?'color:#333333':'color:#67c23a')">{{scope.row.isPay=='-1'?'已取消':(scope.row.isPay=='0'?'待支付':'已支付')}}</span>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -186,7 +206,7 @@ export default {
         };
     },
     created() {
-        document.getElementsByTagName("body")[0].style.minWidth="1100px";
+        document.getElementsByTagName("body")[0].style.minWidth="1000px";
         document.getElementsByTagName("body")[0].style.overflow="auto";
         //时间默认为近一个月
         function getLastMonth() {
@@ -246,6 +266,9 @@ export default {
                     method: "post",
                     data: this.params
                 }).then(data => {
+                    data.list.forEach(item=>{
+                        item.orderCode=item.orderCode.substring(0,4)+'****'+item.orderCode.substring(item.orderCode.length-4)
+                    })
                     this.loading=false
                     this.tableData = data.list
                     this.totalCount=data.totalCount

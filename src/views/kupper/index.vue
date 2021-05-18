@@ -203,7 +203,7 @@ img{width: 50px;height: 50px}
                 <div class="flex-center-Y smallMt">
                     <div class="W-50"><span class="red">*</span>图片
                         <div class="minifont" style="color:#FF0000">图片文件大小不超过2M;</div>
-                        <div class="minifont" style="color:#FF0000">图片尺寸建议335*180;</div>
+                        <div class="minifont" style="color:#FF0000">图片尺寸建议345*150;</div>
                         <div class="minifont" style="color:#FF0000">图片格式为png格式;</div>
                     </div>
                     <el-upload
@@ -322,6 +322,8 @@ export default {
     created(){
         this.getList()
         this.getUrlList()
+        document.getElementsByTagName("body")[0].style.minWidth="1000px";
+        document.getElementsByTagName("body")[0].style.overflow="auto";
     },
     methods:{
         changeUrl(value){

@@ -2,9 +2,10 @@
 #userManage{
     background: #F2F4F8;
     border: 1px solid #E2E5EB;
+    height: 100%;
 }
 #userManage .container{
-            min-height: calc(89vh - 75px);
+            min-height: calc(100% - 75px);
             background: #fff;
             border: 1px solid #E2E5EB;
             padding: 20px;
@@ -232,7 +233,7 @@ export default {
     },
     created() {
         this.getList();
-        document.getElementsByTagName("body")[0].style.minWidth="1400px";
+        document.getElementsByTagName("body")[0].style.minWidth="1000px";
         document.getElementsByTagName("body")[0].style.overflow="auto";
     },
     methods: {

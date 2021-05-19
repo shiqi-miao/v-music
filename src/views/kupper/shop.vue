@@ -292,6 +292,8 @@
                     :http-request="upload2"
                     :before-upload="beforeAvatarUpload2"
                     :on-remove="remove"
+                    :limit="1"
+                    :on-exceed="handleExceed"
                     :file-list="fileList">
                     <el-button size="small" type="primary">点击上传</el-button>
                     <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
@@ -426,6 +428,8 @@
                     :http-request="upload2"
                     :before-upload="beforeAvatarUpload2"
                     :on-remove="remove"
+                    :limit="1"
+                    :on-exceed="handleExceed"
                     :file-list="fileList">
                     <el-button size="small" type="primary">点击上传</el-button>
                     <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
@@ -797,6 +801,12 @@ export default {
                     this.form.mp3Url=data.tempPath
                 })
                 .catch(e => {});
+        },
+        handleExceed(){
+            this.$message({
+                message:"请先删除原文件哦~",
+                type:'warning'
+            })
         },
         remove(fileList){
             console.log(99999)

@@ -31,8 +31,9 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/': {
-        target: 'http://192.168.1.214:8181',
-        logLevel:'debug',
+        // target: 'http://192.168.1.214:8181',
+        target: 'http://121.43.114.209:8181',
+        // logLevel:'debug',
         pathRewrite: {
           '^/': '/'
         }

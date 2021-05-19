@@ -166,11 +166,6 @@ Vue.use(Header);
 Vue.use(Aside);
 Vue.use(Main);
 Vue.use(Footer);
-// Vue.use(VeLine)
-Vue.component(VeLine.name, VeLine);
-Vue.component(VeHistogram.name, VeHistogram);
-Vue.component(VeRing.name, VeRing);
-Vue.component(VeBar.name, VeBar);
 
 Vue.use(Loading.directive);
 

@@ -146,6 +146,9 @@
                         label="商品名称"
                         align="center"
                         min-width="10%">
+                        <template slot-scope="scope">
+                            <span>{{scope.row.orderType=='单曲购买'?scope.row.skuName:scope.row.memGradeName}}</span>
+                        </template>
                     </el-table-column>
                     <el-table-column
                         prop="userName"

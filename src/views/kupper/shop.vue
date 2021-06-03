@@ -184,7 +184,7 @@
                             </el-option>
                         </el-select>
                     </div>
-                <div class="btn" @click="createVisible=true;fileList=[]">创建商品</div>
+                <div class="btn" @click="createVisible=true;fileList=[];fileList1=[]">创建商品</div>
             </div>
             <div>
                 商品分类: 
@@ -284,7 +284,7 @@
                 </div>
             </div>
             <div class="line flex-center-Y">
-                <div class="label">音频文件</div>
+                <div class="label">下载音频</div>
                 <div>
                     <el-upload
                     class="upload-demo"
@@ -295,6 +295,23 @@
                     :limit="1"
                     :on-exceed="handleExceed"
                     :file-list="fileList">
+                    <el-button size="small" type="primary">点击上传</el-button>
+                    <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
+                    </el-upload>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">鉴赏音频</div>
+                <div>
+                    <el-upload
+                    class="upload-demo"
+                    action=""
+                    :http-request="upload4"
+                    :before-upload="beforeAvatarUpload2"
+                    :on-remove="remove1"
+                    :limit="1"
+                    :on-exceed="handleExceed"
+                    :file-list="fileList1">
                     <el-button size="small" type="primary">点击上传</el-button>
                     <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
                     </el-upload>
@@ -420,7 +437,7 @@
                 </div>
             </div>
             <div class="line flex-center-Y">
-                <div class="label">音频文件</div>
+                <div class="label">下载音频</div>
                 <div>
                     <el-upload
                     class="upload-demo"
@@ -431,6 +448,23 @@
                     :limit="1"
                     :on-exceed="handleExceed"
                     :file-list="fileList">
+                    <el-button size="small" type="primary">点击上传</el-button>
+                    <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
+                    </el-upload>
+                </div>
+            </div>
+            <div class="line flex-center-Y">
+                <div class="label">鉴赏音频</div>
+                <div>
+                    <el-upload
+                    class="upload-demo"
+                    action=""
+                    :http-request="upload4"
+                    :before-upload="beforeAvatarUpload2"
+                    :on-remove="remove1"
+                    :limit="1"
+                    :on-exceed="handleExceed"
+                    :file-list="fileList1">
                     <el-button size="small" type="primary">点击上传</el-button>
                     <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
                     </el-upload>
@@ -650,6 +684,7 @@ export default {
                 {contryId:"ID",contryName:"印度尼西亚"}
             ],
             fileList:[],
+            fileList1:[],
         };
     },
     created() {
@@ -802,6 +837,19 @@ export default {
                 })
                 .catch(e => {});
         },
+        upload4(content) {//鉴赏音频
+            var formData = new FormData();
+            formData.append("file", content.file);
+            this.api({
+                url: "/uploadfile/uploadMusic",
+                method: "post",
+                data: formData
+            })
+                .then(data => {
+                    this.form.enjoyUrl=data.tempPath
+                })
+                .catch(e => {});
+        },
         handleExceed(){
             this.$message({
                 message:"请先删除原文件哦~",
@@ -809,8 +857,10 @@ export default {
             })
         },
         remove(fileList){
-            console.log(99999)
             this.form.mp3Url=""
+        },
+        remove1(fileList){
+            this.form.enjoyUrl=""
         },
         upload3(content) {//商品图片
             var formData = new FormData();
@@ -871,6 +921,7 @@ export default {
                         subtitleName:this.selectData.subtitleName,
                         orderNum:this.selectData.orderNum,
                         mp3Url:this.selectData.mp3Url,
+                        enjoyUrl:this.selectData.enjoyUrl,
                         isFree:this.selectData.isFree
                         }
                 })
@@ -923,7 +974,14 @@ export default {
             if(!this.form.mp3Url){
                     this.$message({
                         type: "warning",
-                        message: "请上传音频文件"
+                        message: "请上传下载音频文件"
+                    });
+                    return;
+                }
+            if(!this.form.enjoyUrl){
+                    this.$message({
+                        type: "warning",
+                        message: "请上传鉴赏音频文件"
                     });
                     return;
                 }
@@ -980,6 +1038,7 @@ export default {
                     subtitleName:this.form.subtitleName,
                     orderNum:this.form.orderNum,
                     mp3Url:this.form.mp3Url,
+                    enjoyUrl:this.form.enjoyUrl,
                     isFree:this.form.isFree
                 }
             }).then(data => {
@@ -1020,7 +1079,6 @@ export default {
                     skuCode:row.skuCode
                 }
             }).then(data => {
-                console.log(data.fileName)
                 this.form=data
                 this.imageUrl1=this.form.skuPicture
                 var musicPictureList=[]
@@ -1029,6 +1087,7 @@ export default {
                 }
                 this.musicPictureList=musicPictureList
                 this.fileList=[{name:data.fileName,url:this.form.mp3Url}]
+                this.fileList1=[{name:data.fileEnjoyName,url:this.form.enjoyUrl}]
             });
         },
         clear(){
@@ -1045,6 +1104,7 @@ export default {
                         subtitleName:"",
                         orderNum:"",
                         mp3Url:"",
+                        enjoyUrl:"",
                         isOnline:"1",
                         isFree:"Y"
                         }
@@ -1069,7 +1129,14 @@ export default {
             if(!this.form.mp3Url){
                     this.$message({
                         type: "warning",
-                        message: "请上传音频文件"
+                        message: "请上传下载音频文件"
+                    });
+                    return;
+                }
+            if(!this.form.enjoyUrl){
+                    this.$message({
+                        type: "warning",
+                        message: "请上传鉴赏音频文件"
                     });
                     return;
                 }
@@ -1128,6 +1195,7 @@ export default {
                     subtitleName:this.form.subtitleName,
                     orderNum:this.form.orderNum,
                     mp3Url:this.form.mp3Url,
+                    enjoyUrl:this.form.enjoyUrl,
                     isFree:this.form.isFree
                 }
             }).then(data => {
@@ -1148,6 +1216,7 @@ export default {
                             subtitleName:"",
                             orderNum:"",
                             mp3Url:"",
+                            enjoyUrl:"",
                             isOnline:"1",
                             isFree:"Y"
                             }

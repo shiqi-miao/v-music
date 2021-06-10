@@ -9,7 +9,7 @@ export const constantRouterMap = [
   { path: '/login', component: _import('login/index'), hidden: true },
   { path: '/404', component: _import('404'), hidden: true },
   { path: '/index', component: _import('index'), hidden: true },
-  { path: '/switch', component: _import('switch'), hidden: true },
+  { path: '/evou3aCGCw.txt', component: _import('switch'), hidden: true },
   {
     path: '/',
     component: Layout,

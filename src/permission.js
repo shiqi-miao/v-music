@@ -3,7 +3,7 @@ import store from './store';
 import NProgress from 'nprogress'; // Progress 进度条
 import 'nprogress/nprogress.css'; // Progress 进度条样式
 import { getToken } from '@/utils/seedling'; // 验权
-const whiteList = ['/login', '/404' ,'/evou3aCGCw.txt']; //白名单,不需要登录的路由
+const whiteList = ['/login', '/404' ,'/evou3aCGCw.txt' ,'/switch']; //白名单,不需要登录的路由
 router.beforeEach((to, from, next) => {
   NProgress.start();
   if (getToken()) {

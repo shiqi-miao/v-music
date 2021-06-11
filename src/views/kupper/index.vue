@@ -246,6 +246,10 @@ img{width: 50px;height: 50px}
                         </el-select>
                     </div>
                 </div>
+                <div class="flex-center-Y smallMt" v-if="(selectData.urlType=='内链' || selectData.urlType=='0') && selectData.jumpUrl.indexOf('/play/play')!='-1'">
+                    <div class="W-50"><span class="red">*</span>房间号</div>
+                    <div class="W-50 flex-center-Y"><el-input v-model="selectData.roomId" placeholder="请输入直播房间号"></el-input></div>
+                </div>
                 <div class="flex-center-Y smallMt" v-if="selectData.urlType=='外链' || selectData.urlType=='1'">
                     <div class="W-50"><span class="red">*</span>外链接名称</div>
                     <div class="W-50 flex-center-Y"><el-input maxlength="24" type="textarea" v-model="selectData.linkName" placeholder="请输入外链接描述"></el-input></div>
@@ -282,7 +286,8 @@ export default {
                         wheelAddress: "0",
                         jumpUrl: "",
                         urlType: "0",
-                        wheelRank: ""
+                        wheelRank: "",
+                        roomId:""
             },
             // 标签
             labVisible:false,
@@ -422,6 +427,13 @@ export default {
                     }
                 }).then(data => {
                     this.selectData=data
+                    if((this.selectData.urlType=='内链' || this.selectData.urlType=='0') && this.selectData.jumpUrl.indexOf('/play/play')!='-1'){
+                        var jumpUrl=this.selectData.jumpUrl.split('=')[0]+'='
+                        var roomId=this.selectData.jumpUrl.split('=')[1] || ''
+                        this.selectData.jumpUrl=jumpUrl
+                        this.selectData.roomId=roomId
+                    }
+                    this.selectData=JSON.parse(JSON.stringify(this.selectData))
                 });
             
             
@@ -489,6 +501,13 @@ export default {
                 this.selectData.urlType='1'
             }
             this.selectData.wheelPicture=this.selectData.wheelPic ? this.selectData.wheelPic : this.selectData.wheelPicture
+            if((this.selectData.urlType=='内链' || this.selectData.urlType=='0') && this.selectData.jumpUrl.indexOf('/play/play')!='-1'){
+                if(!this.selectData.roomId){
+                    this.$message.error('请输入直播房间号~');
+                return;
+                }
+                this.selectData.jumpUrl=this.selectData.jumpUrl+this.selectData.roomId
+            }
             if(this.dialogTitle=="添加配置"){
             this.api({
                     url: "/support/api/addWheelPlant",
@@ -504,6 +523,7 @@ export default {
                     this.selectData.urlType="0"
                     this.selectData.wheelPicture=""
                     this.selectData.linkName=""
+                    this.selectData.roomId=""
                 });}else{
                     this.api({
                     url: "/support/api/updateWheelPlant",
@@ -519,6 +539,7 @@ export default {
                     this.selectData.urlType="0"
                     this.selectData.wheelPicture=""
                     this.selectData.linkName=""
+                    this.selectData.roomId=""
                 });
                 }
         },

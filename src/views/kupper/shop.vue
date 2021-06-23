@@ -266,7 +266,7 @@
                            layout="total, sizes, prev, pager, next, jumper">
             </el-pagination>
         </div>
-        <el-dialog :visible.sync="createVisible" title="新建商品" width="600px" custom-class='shopdialog'>
+        <el-dialog :visible.sync="createVisible" title="新建商品" width="600px" custom-class='shopdialog' @close="loading=false;loading1=false">
             <div class="line flex-center-Y">
                 <div class="label">商品图片</div>
                 <div>
@@ -295,7 +295,7 @@
                     :limit="1"
                     :on-exceed="handleExceed"
                     :file-list="fileList">
-                    <el-button size="small" type="primary">点击上传</el-button>
+                    <el-button size="small" type="primary" :loading="loading"><span v-if="!loading">点击上传</span><span v-else>正在上传..</span></el-button>
                     <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
                     </el-upload>
                 </div>
@@ -312,7 +312,7 @@
                     :limit="1"
                     :on-exceed="handleExceed"
                     :file-list="fileList1">
-                    <el-button size="small" type="primary">点击上传</el-button>
+                    <el-button size="small" type="primary" :loading="loading1"><span v-if="!loading1">点击上传</span><span v-else>正在上传..</span></el-button>
                     <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
                     </el-upload>
                 </div>
@@ -448,7 +448,7 @@
                     :limit="1"
                     :on-exceed="handleExceed"
                     :file-list="fileList">
-                    <el-button size="small" type="primary">点击上传</el-button>
+                    <el-button size="small" type="primary" :loading="loading"><span v-if="!loading">点击上传</span><span v-else>正在上传..</span></el-button>
                     <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
                     </el-upload>
                 </div>
@@ -465,7 +465,7 @@
                     :limit="1"
                     :on-exceed="handleExceed"
                     :file-list="fileList1">
-                    <el-button size="small" type="primary">点击上传</el-button>
+                    <el-button size="small" type="primary" :loading="loading1"><span v-if="!loading1">点击上传</span><span v-else>正在上传..</span></el-button>
                     <div slot="tip" class="el-upload__tip">支持上传.mp3文件</div>
                     </el-upload>
                 </div>
@@ -685,6 +685,8 @@ export default {
             ],
             fileList:[],
             fileList1:[],
+            loading:false,
+            loading1:false
         };
     },
     created() {
@@ -825,6 +827,7 @@ export default {
                 .catch(e => {});
         },
         upload2(content) {//音频文件
+            this.loading=true
             var formData = new FormData();
             formData.append("file", content.file);
             this.api({
@@ -834,10 +837,12 @@ export default {
             })
                 .then(data => {
                     this.form.mp3Url=data.tempPath
+                    this.loading=false
                 })
-                .catch(e => {});
+                .catch(e => {this.loading=false});
         },
         upload4(content) {//鉴赏音频
+            this.loading1=true
             var formData = new FormData();
             formData.append("file", content.file);
             this.api({
@@ -847,8 +852,11 @@ export default {
             })
                 .then(data => {
                     this.form.enjoyUrl=data.tempPath
+                    this.loading1=false
                 })
-                .catch(e => {});
+                .catch(e => {
+                this.loading1=false
+                });
         },
         handleExceed(){
             this.$message({
@@ -858,9 +866,11 @@ export default {
         },
         remove(fileList){
             this.form.mp3Url=""
+            this.loading=false
         },
         remove1(fileList){
             this.form.enjoyUrl=""
+            this.loading1=false
         },
         upload3(content) {//商品图片
             var formData = new FormData();
@@ -960,6 +970,13 @@ export default {
                     .catch(e => {});
         },
         commitForm(){//添加商品
+            if(this.loading || this.loading1){
+                this.$message({
+                        type: "warning",
+                        message: "文件正在上传中,请等待.."
+                    });
+                return;
+            }
             var musicPictureList=[]
             for(let i in this.musicPictureList){
                 musicPictureList.push(this.musicPictureList[i].tempPath)
@@ -1109,8 +1126,17 @@ export default {
                         isFree:"Y"
                         }
             this.musicPictureList=[]
+            this.loading=false
+            this.loading1=false
         },
         commitEdit(){//编辑商品
+            if(this.loading || this.loading1){
+                this.$message({
+                        type: "warning",
+                        message: "文件正在上传中,请等待.."
+                    });
+                return;
+            }
             var musicPictureList=[]
             for(let i in this.musicPictureList){
                 if(this.musicPictureList[i].tempPath){

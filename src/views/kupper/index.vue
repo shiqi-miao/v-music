@@ -391,10 +391,10 @@ export default {
         },
         // 上传图片
         beforeAvatarUpload(file) {
-            const isPNG = file.type === 'image/png';
+            const isPNG = file.type === 'image/png' || file.type === 'image/jpg'||file.type === 'image/jpeg';
             const isLt2M = file.size / 1024 / 1024 < 2;
             if (!isPNG) {
-                this.$message.error("上传图片必须为PNG格式!");
+                this.$message.error("仅支持jpg/jpeg/png格式!");
             }
             if (!isLt2M) {
                 this.$message.error("上传图片大小不能超过 2MB!");

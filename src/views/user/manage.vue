@@ -59,7 +59,7 @@
     #baristaOrder >>> .el-input__inner{height:32px;line-height: 32px;}
     #baristaOrder >>> .el-input__prefix{line-height: 32px;cursor:pointer;padding-left: 5px;}
     #baristaOrder >>> .select .el-input__prefix,#baristaOrder .select .el-input__icon{border: 0;padding: 0;}
-    #baristaOrder >>> .el-input__icon{line-height:32px;padding-left: 5px;}
+    #baristaOrder >>> .el-input__icon{line-height:32px;}
     #baristaOrder >>> .el-card__body{height: 100%;padding: 0}
     #baristaOrder >>> .el-upload{width: 100%;height: 100%}
     #baristaOrder >>> .el-checkbox__inner{border-radius: 50%}
@@ -154,6 +154,39 @@
                             <span>{{scope.row.userSex=='2'?'女':'男'}}</span>
                         </template>
                     </el-table-column>
+                    <el-table-column
+                        prop="gradeName"
+                        label="会员等级名称"
+                        align="center"
+                        min-width="10%">
+                    </el-table-column>
+                    <el-table-column
+                        prop="limitTime"
+                        label="会员有效期截止时间"
+                        align="center"
+                        min-width="10%">
+                    </el-table-column>
+                    <el-table-column
+                        prop="gmtCreated"
+                        label="注册时间"
+                        align="center"
+                        min-width="10%">
+                    </el-table-column>
+                    <el-table-column
+                        prop="endLoginTime"
+                        label="最后登录时间"
+                        align="center"
+                        min-width="10%">
+                    </el-table-column>
+                    <el-table-column
+                        prop=""
+                        label="操作"
+                        align="center"
+                        min-width="10%">
+                        <template slot-scope="scope">
+                            <span class="blue" @click="showEdit(scope.row)">编辑</span>
+                        </template>
+                    </el-table-column>
             </el-table>
             <el-table
                     v-show="activeName=='1'"
@@ -233,6 +266,56 @@
                 </div>
             </div>
         </el-dialog>
+        <el-dialog
+            :visible.sync="editVisible"
+            :close-on-click-modal="false"
+            :title="dialogTitle"
+            custom-class="kupperDialog"
+            width="32vw"
+            >
+            <div class="kupperDialog">
+                <div class="flex-center-Y font-bold smallMt">
+                    <div class="W-30">会员昵称</div>
+                    <div class=" flex-center-Y">
+                        {{selectUser.nickName}}
+                    </div>
+                </div>
+                <div class="flex-center-Y font-bold smallMt">
+                    <div class="W-30">手机号</div>
+                    <div class=" flex-center-Y">
+                        {{selectUser.userPhone}}
+                    </div>
+                </div>
+                <div class="flex-center-Y font-bold smallMt">
+                    <div class="W-30">会员等级</div>
+                    <div class=" flex-center-Y">
+                        <el-select v-model="editForm.memberGradeId" placeholder="请选择">
+                            <el-option
+                            v-for="(item,i) in gradeList"
+                            :key="i"
+                            :label="item.gradeName"
+                            :value="item.memberGradeId">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </div>
+                <div class="flex-center-Y font-bold smallMt">
+                    <div class="W-30">会员有效期截止时间</div>
+                    <div class="flex-center-Y">
+                        <el-date-picker
+                        v-model="editForm.limitTime"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="选择截止日期">
+                        </el-date-picker>
+                    </div>
+                </div>
+                <div class="bottom flex-center-Y justify-center" style="margin-top:40px">
+                    <div class="btn1" @click="editVisible=false;editForm=''">取消</div>
+                    <div class="btn" @click="saveEdit">确定</div>
+                </div>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -262,7 +345,10 @@ export default {
                 amount:"",
                 rightsInfo:""
                 },
-            gradeList:[]
+            gradeList:[],
+            editVisible:false,
+            editForm:{},
+            selectUser:""
         };
     },
     created() {
@@ -280,11 +366,39 @@ export default {
     },
 
     methods: {
+        showEdit(row){
+            this.editVisible=true
+            this.selectUser=row
+        },
         addConfig(){//新建
             this.dialogTitle="添加会员等级"
             this.indexVisible=true
         },
-        
+        saveEdit(){
+            if(!this.editForm.memberGradeId){
+                this.$message.warning('请选择会员等级~');
+                return;
+            }
+            if(!this.editForm.limitTime){
+                this.$message.warning('请选择会员有效期截止时间~');
+                return;
+            }
+            this.api({
+                url: " /support/api/memberUpdate",
+                method: "post",
+                data: {
+                    userId:this.selectUser.userId,
+                    memberGrade:this.editForm.memberGradeId,
+                    limitTime:this.editForm.limitTime+" 23:59:59"
+                }
+            }).then(data => {
+                this.editVisible=false
+                this.$message.success('修改成功!');
+                this.getList()
+            }).catch(err=>{
+            });
+
+        },
         saveIndex(){
             if(!this.form.gradeName){
                 this.$message.error('请输入会员名称~');

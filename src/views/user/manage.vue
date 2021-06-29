@@ -172,12 +172,12 @@
                         align="center"
                         min-width="10%">
                     </el-table-column>
-                    <el-table-column
+                    <!-- <el-table-column
                         prop="endLoginTime"
                         label="最后登录时间"
                         align="center"
                         min-width="10%">
-                    </el-table-column>
+                    </el-table-column> -->
                     <el-table-column
                         prop=""
                         label="操作"

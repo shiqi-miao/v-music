@@ -384,7 +384,7 @@ export default {
                 return;
             }
             this.api({
-                url: " /support/api/memberUpdate",
+                url: "/support/api/memberUpdate",
                 method: "post",
                 data: {
                     userId:this.selectUser.userId,

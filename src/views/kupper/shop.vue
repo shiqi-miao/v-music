@@ -5,14 +5,14 @@
     height: 100%;
 }
 #shop .container{
-            min-height: calc(100% - 127px);
+            min-height: calc(100% - 182px);
             background: #fff;
             border: 1px solid #E2E5EB;
             padding: 20px;
             padding-top: 10px;
         }
 #shop .top{
-        height: 127px;
+        height: 182px;
         border: 1px solid #E2E5EB;
         border-bottom: 0;
         background: #fff;
@@ -162,9 +162,13 @@
 <template>
     <div class="app-container" id="shop">
         <div class="top">
+            <el-tabs v-model="activeName" type="card" @tab-click="changeTab">
+                <el-tab-pane label="歌曲"></el-tab-pane>
+                <el-tab-pane label="教学视频"></el-tab-pane>
+            </el-tabs>
             <div class="flex-center-Y" style="margin-bottom:20px">
                 <div class="searchInput">
-                    <el-input placeholder="请输入商品名称" v-model="params.skuName" @input="search" clearable>
+                    <el-input :placeholder="activeName=='0'?'请输入歌曲名称':'请输入视频名称'" v-model="params.skuName" @input="search" clearable>
                         <i
                             class="el-icon-search"
                             slot="prefix"
@@ -173,7 +177,7 @@
                     </el-input>
                 </div>
                     <div class="select">
-                        <el-select v-model="params.isFree" clearable="" placeholder="商品类型" @change="search">
+                        <el-select v-model="params.isFree" clearable="" :placeholder="activeName=='0'?'请选择歌曲类型':'请选择视频类型'" @change="search">
                             <el-option
                             label="付费"
                             value="N">
@@ -184,10 +188,11 @@
                             </el-option>
                         </el-select>
                     </div>
-                <div class="btn" @click="createVisible=true;fileList=[];fileList1=[]">创建商品</div>
+                <div v-if="activeName=='0'" class="btn" @click="createVisible=true;fileList=[];fileList1=[]">创建歌曲</div>
+                <div v-else class="btn" @click="createVisible=true;fileList=[];fileList1=[]">创建教学视频</div>
             </div>
             <div>
-                商品分类: 
+                <span>{{activeName=='0'?'商品分类: ':'视频分类: '}}</span>
                 <el-tag @click.native="chooseType(j)"
                 v-for="(item,j) in typeList"
                 :key="j"
@@ -204,13 +209,13 @@
         </div>
         <div class="container">
         <el-table :data="tableData"
+                  v-if="activeName=='0'"
                   header-row-class-name="userTableStyle" 
                   cell-class-name="userCellStyle"
                   stripe
                   style="width: 100%"
                   v-loading.body="listLoading"
-                  element-loading-text="拼命加载中"
-                  ref="refTable">
+                  element-loading-text="拼命加载中">
             <el-table-column prop="skuPicture"
                              label="商品图片"
                              align="center">
@@ -238,6 +243,58 @@
             </el-table-column>
             <el-table-column prop="isRecommend"
                              label="是否精品歌曲"
+                             align="center">
+                <template slot-scope="scope">
+                    <span>{{scope.row.isFree=='N'?'是':'否'}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column 
+                    label="操作"
+                    width="150"
+                    align="center"
+                    >
+                <template slot-scope="scope">
+                    <span class="blue" @click.stop="edit(scope.row)">编辑</span>
+                    <span class="blue" @click.stop="removeVisible=true;selectData=scope.row">删除</span>
+                </template>
+                
+            </el-table-column>
+        </el-table>
+        <el-table :data="tableDataB"
+                  v-if="activeName=='1'"
+                  header-row-class-name="userTableStyle" 
+                  cell-class-name="userCellStyle"
+                  stripe
+                  style="width: 100%"
+                  v-loading.body="listLoading"
+                  element-loading-text="拼命加载中">
+            <el-table-column prop="skuPicture"
+                             label="视频图片"
+                             align="center">
+                <template slot-scope="scope">
+                    <img :src="scope.row.skuPicture"
+                         width="40"
+                         height="40"
+                         class="portrait" />
+                </template>
+            </el-table-column>
+            <el-table-column prop="skuName"
+                             label="视频名称"
+                             align="center">
+                             </el-table-column>
+            <el-table-column prop="typeName"
+                             label="视频分类"
+                             align="center">
+                             </el-table-column>
+                             <el-table-column prop="salePrice"
+                             label="视频价格（元）"
+                             align="center"></el-table-column>
+            <el-table-column prop="orderNum"
+                             label="上架排序"
+                             align="center">
+            </el-table-column>
+            <el-table-column prop="isRecommend"
+                             label="是否精品视频"
                              align="center">
                 <template slot-scope="scope">
                     <span>{{scope.row.isFree=='N'?'是':'否'}}</span>
@@ -283,7 +340,13 @@
                     </el-upload>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='1'">
+                <div class="label">视频链接</div>
+                <div class="input">
+                    <el-input placeholder="请输入视频链接" v-model="form.videoUrl"></el-input>
+                </div>
+            </div>
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">下载音频</div>
                 <div>
                     <el-upload
@@ -300,7 +363,7 @@
                     </el-upload>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">鉴赏音频</div>
                 <div>
                     <el-upload
@@ -354,19 +417,19 @@
                     </el-select>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">商品标签1</div>
                 <div class="input">
                     <el-input placeholder="请输入商品标签" v-model="form.goodsLabel1"></el-input>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">商品标签2</div>
                 <div class="input">
                     <el-input placeholder="请输入商品标签" v-model="form.goodsLabel2"></el-input>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">商品标签3</div>
                 <div class="input">
                     <el-input placeholder="请输入商品标签" v-model="form.goodsLabel3"></el-input>
@@ -378,7 +441,7 @@
                     <el-input placeholder="请输入商品价格" v-model="form.salePrice" type="number" @input="form.discountedPrice=form.salePrice"></el-input>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">详情介绍</div>
                 <div class="flex-center-Y" style="flex-wrap:wrap;width:400px">
                     <div class="img" v-for="(item,i) in musicPictureList" :key="i" >
@@ -436,7 +499,13 @@
                     </el-upload>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='1'">
+                <div class="label">视频链接</div>
+                <div class="input">
+                    <el-input placeholder="请输入视频链接" v-model="form.videoUrl"></el-input>
+                </div>
+            </div>
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">下载音频</div>
                 <div>
                     <el-upload
@@ -453,7 +522,7 @@
                     </el-upload>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">鉴赏音频</div>
                 <div>
                     <el-upload
@@ -507,19 +576,19 @@
                     </el-select>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">商品标签1</div>
                 <div class="input">
                     <el-input placeholder="请输入商品标签" v-model="form.goodsLabel1"></el-input>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">商品标签2</div>
                 <div class="input">
                     <el-input placeholder="请输入商品标签" v-model="form.goodsLabel2"></el-input>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">商品标签3</div>
                 <div class="input">
                     <el-input placeholder="请输入商品标签" v-model="form.goodsLabel3"></el-input>
@@ -531,7 +600,7 @@
                     <el-input placeholder="请输入商品价格" v-model="form.salePrice" type="number" @input="form.discountedPrice=form.salePrice"></el-input>
                 </div>
             </div>
-            <div class="line flex-center-Y">
+            <div class="line flex-center-Y" v-if="activeName=='0'">
                 <div class="label">详情介绍</div>
                 <div class="flex-center-Y" style="flex-wrap:wrap;width:400px">
                     <div class="img" v-for="(item,i) in musicPictureList" :key="i" >
@@ -616,15 +685,17 @@ import axios from 'axios'
 export default {
     data() {
         return {
+            activeName:"0",
             showshow:false,
             expands:[],
             productionStatus:"0",
             batchList:[],
             listLoading: false,
             totalCount: 0,
-            form:{skuPicture:"",skuName:"",salePrice:"",isOnline:"1",isFree:"Y"},
+            form:{type:"1",skuPicture:"",skuName:"",salePrice:"",isOnline:"1",isFree:"Y"},
             addData:[{createdTimes:"",wareNums:""}],
-            tableData: [{}],
+            tableData: [],
+            tableDataB:[],
             typeFilters: [],
             typeFiltersB: [
                 { text: "由低到高", value: 1 },
@@ -698,6 +769,13 @@ export default {
         document.getElementsByTagName("body")[0].style.overflow="auto";
     },
     methods: {
+        changeTab(){
+            this.getTypeList();
+            this.params.typeId=""
+            this.params.isFree=""
+            this.params.skuName=""
+            this.search()
+        },
         editTop(row){
              this.$confirm('是否保存修改?', '提示', {
                 confirmButtonText: '确定',
@@ -912,7 +990,8 @@ export default {
                     .catch(e => {});
         },
         commitRemove(){//删除商品
-            this.api({
+            if(this.activeName=='0'){
+                this.api({
                     url: "/support/api/addOrUpdateMusic",
                     method: "post",
                     data: {
@@ -940,37 +1019,34 @@ export default {
                         this.removeVisible=false
                     })
                     .catch(e => {});
-        },
-        changePut(row){//上架
-            this.api({
-                    url: "/shopping/sku/onlineChange",
+            }else{
+                this.api({
+                    url: "/support/api/addOrUpdateVideo",
                     method: "post",
                     data: {
-                        skuCode:row.skuCode,
-                        isOnline:row.isOnline
-                    }
+                        action:"DELETE",
+                        isAlive:"0",
+                        skuCode:this.selectData.skuCode,
+                        isOnline:this.selectData.isOnline,
+                        skuName:this.selectData.skuName,
+                        salePrice:this.selectData.salePrice*100,
+                        skuPicture:this.selectData.skuPicture,
+                        typeId:this.selectData.typeId,
+                        subtitleName:this.selectData.subtitleName,
+                        orderNum:this.selectData.orderNum,
+                        videoUrl:this.selectData.videoUrl,
+                        isFree:this.selectData.isFree
+                        }
                 })
                     .then(data => {
-                        this.getList()
+                        this.getTypeList()
+                        this.removeVisible=false
                     })
                     .catch(e => {});
-        },
-        changeCommend(row){//推荐
-            this.api({
-                    url: "/shopping/sku/recommendChange",
-                    method: "post",
-                    data: {
-                        skuCode:row.skuCode,
-                        isRecommend:row.isRecommend
-                    }
-                })
-                    .then(data => {
-                        this.getList()
-                    })
-                    .catch(e => {});
+            }
         },
         commitForm(){//添加商品
-            if(this.loading || this.loading1){
+            if(this.activeName=='0' && (this.loading || this.loading1)){
                 this.$message({
                         type: "warning",
                         message: "文件正在上传中,请等待.."
@@ -988,14 +1064,21 @@ export default {
                     });
                     return;
                 }
-            if(!this.form.mp3Url){
+            if(this.activeName=='1' && !this.form.videoUrl){
+                this.$message({
+                        type: "warning",
+                        message: "请输入视频链接"
+                    });
+                return;
+            }
+            if(this.activeName=='0' && !this.form.mp3Url){
                     this.$message({
                         type: "warning",
                         message: "请上传下载音频文件"
                     });
                     return;
                 }
-            if(!this.form.enjoyUrl){
+            if(this.activeName=='0' && !this.form.enjoyUrl){
                     this.$message({
                         type: "warning",
                         message: "请上传鉴赏音频文件"
@@ -1030,82 +1113,143 @@ export default {
                     });
                     return;
                 }
-            if(this.musicPictureList.length==0){
+            if(this.activeName=='0' && this.musicPictureList.length==0){
                     this.$message({
                         type: "warning",
                         message: "请上传详情介绍图片"
                     });
                     return;
                 }
-            this.api({
-                url: "/support/api/addOrUpdateMusic",
-                method: "post",
-                data: {
-                    action:"ADD",
-                    isAlive:"1",
-                    isOnline:this.form.isOnline,
-                    skuName:this.form.skuName,
-                    salePrice:this.form.salePrice*100,
-                    skuPicture:this.form.skuPicture,
-                    musicPictureList:musicPictureList,
-                    typeId:this.form.typeId,
-                    goodsLabel1:this.form.goodsLabel1,
-                    goodsLabel2:this.form.goodsLabel2,
-                    goodsLabel3:this.form.goodsLabel3,
-                    subtitleName:this.form.subtitleName,
-                    orderNum:this.form.orderNum,
-                    mp3Url:this.form.mp3Url,
-                    enjoyUrl:this.form.enjoyUrl,
-                    isFree:this.form.isFree
-                }
-            }).then(data => {
-                this.$message({
-                        type: "success",
-                        message: "添加成功 !"
-                    });
-                this.imageUrl1=''
-                this.form={
-                            skuName:"",
-                            salePrice:"",
-                            skuPicture:"",
-                            musicPictureList:"",
-                            typeId:"",
-                            goodsLabel1:"",
-                            goodsLabel2:"",
-                            goodsLabel3:"",
-                            subtitleName:"",
-                            orderNum:"",
-                            mp3Url:"",
-                            isOnline:"1",
-                            isFree:"Y"
-                            }
-                this.musicPictureList=[]
-                this.createVisible=false
-                this.getTypeList()
-            }).catch(data =>{
-                 
-            });
+            if(this.activeName=='0'){
+                this.api({
+                    url: "/support/api/addOrUpdateMusic",
+                    method: "post",
+                    data: {
+                        action:"ADD",
+                        isAlive:"1",
+                        isOnline:this.form.isOnline,
+                        skuName:this.form.skuName,
+                        salePrice:this.form.salePrice*100,
+                        skuPicture:this.form.skuPicture,
+                        musicPictureList:musicPictureList,
+                        typeId:this.form.typeId,
+                        goodsLabel1:this.form.goodsLabel1,
+                        goodsLabel2:this.form.goodsLabel2,
+                        goodsLabel3:this.form.goodsLabel3,
+                        subtitleName:this.form.subtitleName,
+                        orderNum:this.form.orderNum,
+                        mp3Url:this.form.mp3Url,
+                        enjoyUrl:this.form.enjoyUrl,
+                        isFree:this.form.isFree
+                    }
+                }).then(data => {
+                    this.$message({
+                            type: "success",
+                            message: "添加成功 !"
+                        });
+                    this.imageUrl1=''
+                    this.form={
+                                skuName:"",
+                                salePrice:"",
+                                skuPicture:"",
+                                musicPictureList:"",
+                                typeId:"",
+                                goodsLabel1:"",
+                                goodsLabel2:"",
+                                goodsLabel3:"",
+                                subtitleName:"",
+                                orderNum:"",
+                                mp3Url:"",
+                                isOnline:"1",
+                                isFree:"Y",
+                                videoUrl:""
+                                }
+                    this.musicPictureList=[]
+                    this.createVisible=false
+                    this.getTypeList()
+                }).catch(data =>{
+                    
+                });
+            }else{
+                this.api({
+                    url: "/support/api/addOrUpdateVideo",
+                    method: "post",
+                    data: {
+                        action:"ADD",
+                        isAlive:"1",
+                        isOnline:this.form.isOnline,
+                        skuName:this.form.skuName,
+                        salePrice:this.form.salePrice*100,
+                        skuPicture:this.form.skuPicture,
+                        typeId:this.form.typeId,
+                        subtitleName:this.form.subtitleName,
+                        orderNum:this.form.orderNum,
+                        videoUrl:this.form.videoUrl,
+                        isFree:this.form.isFree
+                    }
+                }).then(data => {
+                    this.$message({
+                            type: "success",
+                            message: "添加成功 !"
+                        });
+                    this.imageUrl1=''
+                    this.form={
+                                skuName:"",
+                                salePrice:"",
+                                skuPicture:"",
+                                musicPictureList:"",
+                                typeId:"",
+                                goodsLabel1:"",
+                                goodsLabel2:"",
+                                goodsLabel3:"",
+                                subtitleName:"",
+                                orderNum:"",
+                                mp3Url:"",
+                                isOnline:"1",
+                                isFree:"Y",
+                                videoUrl:""
+                                }
+                    this.musicPictureList=[]
+                    this.createVisible=false
+                    this.getTypeList()
+                }).catch(data =>{
+                    
+                });
+            }
             
         },
         edit(row){
             this.editVisible=true
-            this.api({
-                url: "/support/api/updateMusicShow",
-                method: "post",
-                data: {
-                    skuCode:row.skuCode
-                }
-            }).then(data => {
-                this.form=data
-                this.imageUrl1=this.form.skuPicture
-                var musicPictureList=[]
-                for(let i in this.form.musicPictureList){
-                    musicPictureList.push({filePath:this.form.musicPictureList[i].pictureUrl})
-                }
-                this.musicPictureList=musicPictureList
-                this.fileList=[{name:data.fileName,url:this.form.mp3Url}]
-                this.fileList1=[{name:data.fileEnjoyName,url:this.form.enjoyUrl}]
-            });
+            if(this.activeName=='0'){
+                this.api({
+                    url: "/support/api/updateMusicShow",
+                    method: "post",
+                    data: {
+                        skuCode:row.skuCode
+                    }
+                }).then(data => {
+                    this.form=data
+                    this.imageUrl1=this.form.skuPicture
+                    var musicPictureList=[]
+                    for(let i in this.form.musicPictureList){
+                        musicPictureList.push({filePath:this.form.musicPictureList[i].pictureUrl})
+                    }
+                    this.musicPictureList=musicPictureList
+                    this.fileList=[{name:data.fileName,url:this.form.mp3Url}]
+                    this.fileList1=[{name:data.fileEnjoyName,url:this.form.enjoyUrl}]
+                });
+            }else{
+                this.api({
+                    url: "/support/api/updateVideoShow",
+                    method: "post",
+                    data: {
+                        skuCode:row.skuCode
+                    }
+                }).then(data => {
+                    this.form=data
+                    this.imageUrl1=this.form.skuPicture
+                });
+            }
         },
         clear(){
             this.imageUrl1=''
@@ -1123,14 +1267,15 @@ export default {
                         mp3Url:"",
                         enjoyUrl:"",
                         isOnline:"1",
-                        isFree:"Y"
+                        isFree:"Y",
+                        videoUrl:""
                         }
             this.musicPictureList=[]
             this.loading=false
             this.loading1=false
         },
         commitEdit(){//编辑商品
-            if(this.loading || this.loading1){
+            if(this.activeName=='0' && (this.loading || this.loading1)){
                 this.$message({
                         type: "warning",
                         message: "文件正在上传中,请等待.."
@@ -1152,14 +1297,21 @@ export default {
                     });
                     return;
                 }
-            if(!this.form.mp3Url){
+            if(this.activeName=='1' && !this.form.videoUrl){
+                this.$message({
+                        type: "warning",
+                        message: "请输入视频链接"
+                    });
+                return;
+            }
+            if(this.activeName=='0' && !this.form.mp3Url){
                     this.$message({
                         type: "warning",
                         message: "请上传下载音频文件"
                     });
                     return;
                 }
-            if(!this.form.enjoyUrl){
+            if(this.activeName=='0' && !this.form.enjoyUrl){
                     this.$message({
                         type: "warning",
                         message: "请上传鉴赏音频文件"
@@ -1194,64 +1346,113 @@ export default {
                     });
                     return;
                 }
-            if(this.musicPictureList.length==0){
+            if(this.activeName=='0' && this.musicPictureList.length==0){
                     this.$message({
                         type: "warning",
                         message: "请上传详情介绍图片"
                     });
                     return;
                 }
-            
-            this.api({
-                url: "/support/api/addOrUpdateMusic",
-                method: "post",
-                data: {
-                    action:"UPDATE",
-                    isAlive:"1",
-                    isOnline:this.form.isOnline,
-                    skuCode:this.form.skuCode,
-                    skuName:this.form.skuName,
-                    salePrice:this.form.salePrice*100,
-                    skuPicture:this.form.skuPicture,
-                    musicPictureList:musicPictureList,
-                    typeId:this.form.typeId,
-                    goodsLabel1:this.form.goodsLabel1,
-                    goodsLabel2:this.form.goodsLabel2,
-                    goodsLabel3:this.form.goodsLabel3,
-                    subtitleName:this.form.subtitleName,
-                    orderNum:this.form.orderNum,
-                    mp3Url:this.form.mp3Url,
-                    enjoyUrl:this.form.enjoyUrl,
-                    isFree:this.form.isFree
-                }
-            }).then(data => {
-                this.$message({
-                        type: "success",
-                        message: "保存成功 !"
-                    });
-                this.imageUrl1=''
-                this.form={
-                            skuName:"",
-                            salePrice:"",
-                            skuPicture:"",
-                            musicPictureList:"",
-                            typeId:"",
-                            goodsLabel1:"",
-                            goodsLabel2:"",
-                            goodsLabel3:"",
-                            subtitleName:"",
-                            orderNum:"",
-                            mp3Url:"",
-                            enjoyUrl:"",
-                            isOnline:"1",
-                            isFree:"Y"
-                            }
-                this.musicPictureList=[]
-                this.editVisible=false
-                this.getTypeList()
-            }).catch(data =>{
-                 
-            });
+            if(this.activeName=='0'){
+                this.api({
+                    url: "/support/api/addOrUpdateMusic",
+                    method: "post",
+                    data: {
+                        action:"UPDATE",
+                        isAlive:"1",
+                        isOnline:this.form.isOnline,
+                        skuCode:this.form.skuCode,
+                        skuName:this.form.skuName,
+                        salePrice:this.form.salePrice*100,
+                        skuPicture:this.form.skuPicture,
+                        musicPictureList:musicPictureList,
+                        typeId:this.form.typeId,
+                        goodsLabel1:this.form.goodsLabel1,
+                        goodsLabel2:this.form.goodsLabel2,
+                        goodsLabel3:this.form.goodsLabel3,
+                        subtitleName:this.form.subtitleName,
+                        orderNum:this.form.orderNum,
+                        mp3Url:this.form.mp3Url,
+                        enjoyUrl:this.form.enjoyUrl,
+                        isFree:this.form.isFree
+                    }
+                }).then(data => {
+                    this.$message({
+                            type: "success",
+                            message: "保存成功 !"
+                        });
+                    this.imageUrl1=''
+                    this.form={
+                                skuName:"",
+                                salePrice:"",
+                                skuPicture:"",
+                                musicPictureList:"",
+                                typeId:"",
+                                goodsLabel1:"",
+                                goodsLabel2:"",
+                                goodsLabel3:"",
+                                subtitleName:"",
+                                orderNum:"",
+                                mp3Url:"",
+                                enjoyUrl:"",
+                                isOnline:"1",
+                                isFree:"Y",
+                                videoUrl:""
+                                }
+                    this.musicPictureList=[]
+                    this.editVisible=false
+                    this.getTypeList()
+                }).catch(data =>{
+                    
+                });
+            }else{
+                this.api({
+                    url: "/support/api/addOrUpdateVideo",
+                    method: "post",
+                    data: {
+                        action:"UPDATE",
+                        isAlive:"1",
+                        isOnline:this.form.isOnline,
+                        skuCode:this.form.skuCode,
+                        skuName:this.form.skuName,
+                        salePrice:this.form.salePrice*100,
+                        skuPicture:this.form.skuPicture,
+                        typeId:this.form.typeId,
+                        subtitleName:this.form.subtitleName,
+                        orderNum:this.form.orderNum,
+                        videoUrl:this.form.videoUrl,
+                        isFree:this.form.isFree
+                    }
+                }).then(data => {
+                    this.$message({
+                            type: "success",
+                            message: "保存成功 !"
+                        });
+                    this.imageUrl1=''
+                    this.form={
+                                skuName:"",
+                                salePrice:"",
+                                skuPicture:"",
+                                musicPictureList:"",
+                                typeId:"",
+                                goodsLabel1:"",
+                                goodsLabel2:"",
+                                goodsLabel3:"",
+                                subtitleName:"",
+                                orderNum:"",
+                                mp3Url:"",
+                                enjoyUrl:"",
+                                isOnline:"1",
+                                isFree:"Y",
+                                videoUrl:""
+                                }
+                    this.musicPictureList=[]
+                    this.editVisible=false
+                    this.getTypeList()
+                }).catch(data =>{
+                    
+                });
+            }
         },
         
         handleSizeChange(val) {
@@ -1299,19 +1500,31 @@ export default {
             });
         },
         getList() {
-            this.listLoading = true;
-            this.api({
-                url: "/support/api/musicList",
-                method: "post",
-                data: this.params
-            }).then(data => {
-                this.listLoading = false;
-                this.tableData = data.list;
-                this.totalCount = data.totalCount;
-            });
+            if(this.activeName=='0'){
+                this.listLoading = true;
+                this.api({
+                    url: "/support/api/musicList",
+                    method: "post",
+                    data: this.params
+                }).then(data => {
+                    this.listLoading = false;
+                    this.tableData = data.list;
+                    this.totalCount = data.totalCount;
+                });
+            }else{
+                this.listLoading = true;
+                this.api({
+                    url: "/support/api/videoList",
+                    method: "post",
+                    data: this.params
+                }).then(data => {
+                    this.listLoading = false;
+                    this.tableDataB = data.list;
+                    this.totalCount = data.totalCount;
+                });
+            }
         },
         showType(scope) {//添加或编辑分类
-            console.log(scope)
             if (scope.typeId) {
                 this.title = "编辑分类";
                 this.dialogType = 2;
@@ -1339,20 +1552,37 @@ export default {
                 });
                 return;
             }
-            this.api({
-                url: "/support/api/addType",
-                method: "post",
-                data: {
-                    typeName: this.typeName
-                }
-            }).then(data => {
-                this.$message({
-                    type: "success",
-                    message: "添加成功"
+            if(this.activeName=='0'){
+                this.api({
+                    url: "/support/api/addType",
+                    method: "post",
+                    data: {
+                        typeName: this.typeName
+                    }
+                }).then(data => {
+                    this.$message({
+                        type: "success",
+                        message: "添加成功"
+                    });
+                    this.getTypeList()
+                    this.typeDialogVisible = false;
                 });
-                this.getTypeList()
-                this.typeDialogVisible = false;
-            });
+            }else{
+                this.api({
+                    url: "/support/api/videoAddType",
+                    method: "post",
+                    data: {
+                        typeName: this.typeName
+                    }
+                }).then(data => {
+                    this.$message({
+                        type: "success",
+                        message: "添加成功"
+                    });
+                    this.getTypeList()
+                    this.typeDialogVisible = false;
+                });
+            }
         },
         editType(item){//编辑分类
             if (!this.typeName || this.typeName.length > 8) {
@@ -1376,22 +1606,41 @@ export default {
                 });
                 return;
             }
-            this.api({
-                url: "/support/api/updateType",
-                method: "post",
-                data: {
-                    typeId: this.typeId,
-                    typeName: this.typeName
-                }
-            }).then(data => {
-                this.$message({
-                    type: "success",
-                    message: "修改成功"
+            if(this.activeName=='0'){
+                this.api({
+                    url: "/support/api/updateType",
+                    method: "post",
+                    data: {
+                        typeId: this.typeId,
+                        typeName: this.typeName
+                    }
+                }).then(data => {
+                    this.$message({
+                        type: "success",
+                        message: "修改成功"
+                    });
+                    this.getTypeList()
+                    this.getList()
+                    this.typeDialogVisible = false;
                 });
-                this.getTypeList()
-                this.getList()
-                this.typeDialogVisible = false;
-            });
+            }else{
+                this.api({
+                    url: "/support/api/videoUpdateType",
+                    method: "post",
+                    data: {
+                        typeId: this.typeId,
+                        typeName: this.typeName
+                    }
+                }).then(data => {
+                    this.$message({
+                        type: "success",
+                        message: "修改成功"
+                    });
+                    this.getTypeList()
+                    this.getList()
+                    this.typeDialogVisible = false;
+                });
+            }
         },
         deleteType(row){//删除分类
             this.$confirm("确定删除该分类?", "提示", {
@@ -1399,44 +1648,85 @@ export default {
                 showCancelButton: false,
                 type: "warning"
             }).then(() => {
-                this.api({
-                    url: "/support/api/deleteType",
-                    method: "post",
-                    data: {
-                        typeId: row.typeId
-                    }
-                }).then(data => {
-                    this.$message({
-                        type: "success",
-                        message: "删除成功"
+                if(this.activeName=='0'){
+                    this.api({
+                        url: "/support/api/deleteType",
+                        method: "post",
+                        data: {
+                            typeId: row.typeId
+                        }
+                    }).then(data => {
+                        this.$message({
+                            type: "success",
+                            message: "删除成功"
+                        });
+                        this.getTypeList()
+                        this.params.typeId=""
+                        this.getList()
                     });
-                    this.getTypeList()
-                    this.params.typeId=""
-                    this.getList()
-                });
+                }else{
+                    this.api({
+                        url: "/support/api/videoDeleteType",
+                        method: "post",
+                        data: {
+                            typeId: row.typeId
+                        }
+                    }).then(data => {
+                        this.$message({
+                            type: "success",
+                            message: "删除成功"
+                        });
+                        this.getTypeList()
+                        this.params.typeId=""
+                        this.getList()
+                    });
+                }
             });
         },
         getTypeList(){
-            this.api({
-                url: "/support/api/typeList",
-                method: "post",
-                data:{}
-            }).then(data => {
-                this.typeList=data.list
-                this.typeList1=JSON.parse(JSON.stringify(this.typeList)) 
-                this.typeList.unshift({typeName:"全部",typeId:""})
-                if(!this.params.typeId){
-                    this.typeList[0].isActive=true
-                    this.params.typeId=this.typeList[0].typeId
-                }else{
-                    this.typeList.forEach(item => {
-                        if(item.typeId==this.params.typeId){
-                            item.isActive=true
-                        }
-                    })
-                }
-                this.getList()
-            });
+            if(this.activeName=='0'){
+                this.api({
+                    url: "/support/api/typeList",
+                    method: "post",
+                    data:{}
+                }).then(data => {
+                    this.typeList=data.list
+                    this.typeList1=JSON.parse(JSON.stringify(this.typeList)) 
+                    this.typeList.unshift({typeName:"全部",typeId:""})
+                    if(!this.params.typeId){
+                        this.typeList[0].isActive=true
+                        this.params.typeId=this.typeList[0].typeId
+                    }else{
+                        this.typeList.forEach(item => {
+                            if(item.typeId==this.params.typeId){
+                                item.isActive=true
+                            }
+                        })
+                    }
+                    this.getList()
+                });
+            }else{
+                this.api({
+                    url: "/support/api/videoTypeList",
+                    method: "post",
+                    data:{}
+                }).then(data => {
+                    this.typeList=data.list
+                    this.typeList1=JSON.parse(JSON.stringify(this.typeList)) 
+                    this.typeList.unshift({typeName:"全部",typeId:""})
+                    if(!this.params.typeId){
+                        this.typeList[0].isActive=true
+                        this.params.typeId=this.typeList[0].typeId
+                    }else{
+                        this.typeList.forEach(item => {
+                            if(item.typeId==this.params.typeId){
+                                item.isActive=true
+                            }
+                        })
+                    }
+                    this.getList()
+                });
+            }
         },
         isHasName() {
             for (let i in this.typeList) {

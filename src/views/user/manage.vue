@@ -311,7 +311,7 @@
                     </div>
                 </div>
                 <div class="bottom flex-center-Y justify-center" style="margin-top:40px">
-                    <div class="btn1" @click="editVisible=false;editForm=''">取消</div>
+                    <div class="btn1" @click="editVisible=false;">取消</div>
                     <div class="btn" @click="saveEdit">确定</div>
                 </div>
             </div>
